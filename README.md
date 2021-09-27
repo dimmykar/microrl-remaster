@@ -1,0 +1,124 @@
+# Micro Read Line library for small and embedded devices with basic VT100 support
+
+## 1. Description
+
+Microrl library is designed to help implement command line interface in small and embedded devices. Main goal is to write compact, small memory consuming but powerful interfaces, with support navigation through command line with cursor, HOME, END keys, hot key like Ctrl+U and other, history and completion feature.
+
+
+## 2. Features
+
+  - `microrl_config.h` and `microrl_user_config.h` files
+    * Turn on/off feature for add functional/decrease memory via config files.
+
+  - Pass the pointer to `microrl_t` in all callbacks so that the operations can be specific to a particular instance of microrl
+
+  - Hot keys support
+    * Backspace, cursor arrows, HOME, END keys
+    * Ctrl+U (cut line from cursor to begin)
+    * Ctrl+K (cut line from cursor to end)
+    * Ctrl+A (like HOME)
+    * Ctrl+E (like END)
+    * Ctrl+H (like backspace)
+    * Ctrl+D (delete one character forward)
+    * Ctrl+B (like cursor arrow left) 
+    * Ctrl+F (like cursor arrow right)
+    * Ctrl+P (like cursor arrow up)
+    * Ctrl+N (like cursor arrow down)
+    * Ctrl+R (retype prompt and partial command)
+    * Ctrl+C (call `sigint()` callback, only for embedded system)
+
+  - History (optional)
+    * Static ring buffer history for memory saving. Number of commands saved to history depends from commands length and buffer size (defined in config)
+
+  - Completion (optional)
+    * Command completion via completion callback
+
+  - Quoting (optional)
+    * Use single or double quotes around a command argument that needs to include space characters
+
+  - Echo control
+    * Use `microrl_set_echo()` function to turn on or turn off echo.
+    * Could be used to print `*` insted of real characters.
+	 
+<img src="/img/demo.png" alt="Window of terminal with microrl library"/>
+
+
+## 3. Source code organization
+
+```
+src/                    - library source
+  microrl.c             - microrl routines
+  microrl.h             - lib interface and data type
+  microrl_config.h      - file with default configs
+  microrl_user_config.h - customisation config-file
+examples/               - library usage examples
+  avr_misc/             - avr specific routines for avr example
+  unix_misc/            - unix specific routines for desktop example
+  example.c             - common part of example, for build  demonstrating example for various platform
+  example_misc.h        - interface to platform specific routines for example build (avr, unix)
+  Makefile              - unix example build (gcc)
+  Makefile.avr          - avr example build (avr-gcc)
+```
+
+
+## 4. Install
+
+Requirements: C compiler with support for C99 standard (GNU GCC, Keil, IAR) with standard C library (libc, uClibc or other compatible). Also you have to implement several routines in your own code for library to work.
+
+__NOTE:__ need add `-std=gnu99` arg for gcc
+
+For embed lib to you project, you need to do few simple steps:
+
+a) Include `microrl.h` file to you project.
+
+b) Create `microrl_t` object, and call `microrl_init()` func, with print callback pointer. Print callback pointer is pointer to function that call by library if it's need to put text to terminal. Text string always is null terminated.
+For example on linux PC print callback may be:
+```
+/* Print callback for microrl library */
+int print(microrl_t* mrl, char* str) {
+    return fprintf(stdout, "%s", str);
+}
+```
+
+c) Call `microrl_set_execute_callback()` with pointer to you routine, what will be called if user press enter in terminal. Execute callback give a `argc`, `argv` parametrs, like `main()` func in application. All token in `argv` is null terminated. So you can simply walk through `argv` and handle commands.
+
+d) If you want completion support if user press TAB key, call `microrl_set_complete_callback()` and set you callback. It also give `argc` and `argv` arguments, so iterate through it and return set of complete variants.
+
+e) Look at `microrl_config.h` file and tune library in `microrl_user_config.h`. To do this, copy the default configs from `microrl_config.h` to `microrl_user_config.h` and change them for you requiring. Then you can replace `microrl_user_config.h` to your project.
+
+f) Now you just call `microrl_insert_char()` on each char received from input stream (usart, network, etc).
+
+Example of code:
+```
+int main (int argc, char** argv) {
+    /* Create microrl instance */
+    microrl_t rl;
+
+    /* Initialize library with microrl instance and print and execute callbacks */
+    microrl_init(&rl, print, execute);
+
+    /* Set callback for completion (optionally) */
+    microrl_set_complete_callback(&rl, complet);
+
+    /* Set callback for Ctrl+C handling (optionally) */
+    microrl_set_sigint_callback(&rl, sigint);
+    
+    while (1) {
+        /* Put received char from stdin to microrl instance */
+        char ch = get_char();
+        microrl_processing_input(&rl, ch, 1);
+    }
+
+    return 0;
+}
+```
+
+See examples of library usage.
+
+
+
+Author: Eugene Samoylov aka Helius (ghelius@gmail.com)
+01.09.2011
+
+Remastered by: Dmitry Karasev aka dimmykar (karasevsdmitry@yandex.ru)
+27.09.2021
