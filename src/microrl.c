@@ -224,11 +224,11 @@ static void prv_cmdline_buf_backspace(microrl_t* mrl, size_t len) {
  */
 static void prv_cmdline_buf_delete(microrl_t* mrl) {
     if ((mrl->cmdlen > 0) && (mrl->cursor != mrl->cmdlen)) {
-      memmove(mrl->cmdline + mrl->cursor,
-              mrl->cmdline + mrl->cursor + 1,
-              mrl->cmdlen - mrl->cursor + 1);
-      mrl->cmdline[mrl->cmdlen] = '\0';
-      --mrl->cmdlen;
+        memmove(mrl->cmdline + mrl->cursor,
+                mrl->cmdline + mrl->cursor + 1,
+                mrl->cmdlen - mrl->cursor + 1);
+        mrl->cmdline[mrl->cmdlen] = '\0';
+        --mrl->cmdlen;
     }
 }
 
@@ -297,7 +297,7 @@ static char* prv_cursor_generate_move(char* str, int32_t offset) {
 #else
     *str++ = '\033';
     *str++ = '[';
-    char tmp_str[4] = {0,};
+    char tmp_str[4] = {0};
     size_t i = 0;
     size_t j;
     while (offset > 0) {
@@ -372,25 +372,27 @@ static void prv_terminal_print_line(microrl_t* mrl, int32_t pos, uint8_t reset) 
 #if MICRORL_CFG_USE_HISTORY || __DOXYGEN__
 
 /**
+ * \brief           Set the next record start position to the passed index
+ * \param[in]       prbuf: Pointer to \ref microrl_hist_rbuf_t structure
+ * \param[in,out]   index: Pointer to the current record
+ */
+inline static void prv_hist_next_record(microrl_hist_rbuf_t* prbuf, size_t* index) {
+    while (prbuf->ring_buf[*index] != '\0') {
+        ++(*index);
+        if (*index >= MICRORL_ARRAYSIZE(prbuf->ring_buf)) {
+            *index -= MICRORL_ARRAYSIZE(prbuf->ring_buf);
+        }
+    }
+    ++(*index);
+}
+
+/**
  * \brief           Remove older record from ring buffer
  * \param[in,out]   prbuf: Pointer to \ref microrl_hist_rbuf_t structure
  */
 static void prv_hist_erase_older(microrl_hist_rbuf_t* prbuf) {
-    size_t new_pos = 0;
-
-    if (prbuf->tail >= prbuf->head) {
-        new_pos = prbuf->head + strlen(&prbuf->ring_buf[prbuf->head]) + 1;
-    } else {
-        new_pos = prbuf->head;
-        while (prbuf->ring_buf[new_pos] != '\0') {
-            ++new_pos;
-            if (new_pos >= MICRORL_ARRAYSIZE(prbuf->ring_buf)) {
-                new_pos -= MICRORL_ARRAYSIZE(prbuf->ring_buf);
-            }
-        }
-        ++new_pos;
-    }
-
+    size_t new_pos = prbuf->head;
+    prv_hist_next_record(prbuf, &new_pos);
     prbuf->head = new_pos;
 }
 
@@ -452,21 +454,6 @@ static void prv_hist_save_line(microrl_hist_rbuf_t* prbuf, char* line, size_t le
 }
 
 /**
- * \brief           Set the next record start position to the passed index
- * \param[in]       prbuf: Pointer to \ref microrl_hist_rbuf_t structure
- * \param[in,out]   index: Pointer to the current record
- */
-inline static void prv_hist_next_record(microrl_hist_rbuf_t* prbuf, size_t* index) {
-    while (prbuf->ring_buf[*index] != '\0') {
-        ++(*index);
-        if (*index >= MICRORL_ARRAYSIZE(prbuf->ring_buf)) {
-            *index -= MICRORL_ARRAYSIZE(prbuf->ring_buf);
-        }
-    }
-    ++(*index);
-}
-
-/**
  * \brief           Copy saved record to 'line' and return size of record
  * \param[out]      mrl: \ref microrl_t working instance
  * \param[in]       prbuf: Pointer to \ref microrl_hist_rbuf_t structure
@@ -525,12 +512,11 @@ static size_t prv_hist_restore_line(microrl_t* mrl, microrl_hist_rbuf_t* prbuf, 
     }
 
     /* Placing the found record on the command line */
+    memset(line, 0x00, MICRORL_ARRAYSIZE(mrl->cmdline) - 1);
     if ((ind + rec_len) < MICRORL_ARRAYSIZE(prbuf->ring_buf)) {
-        memset(line, 0x00, MICRORL_ARRAYSIZE(mrl->cmdline) - 1);
         memcpy(line, prbuf->ring_buf + ind, rec_len);
     } else {
         size_t part0 = MICRORL_ARRAYSIZE(prbuf->ring_buf) - ind;
-        memset(line, 0x00, MICRORL_ARRAYSIZE(mrl->cmdline) - 1);
         memcpy(line, prbuf->ring_buf + ind, part0);
         memcpy(line + part0, prbuf->ring_buf, rec_len - part0);
     }
@@ -851,6 +837,7 @@ microrlr_t microrl_processing_input(microrl_t* mrl, const void* in_data, size_t 
                 continue;
             }
             mrl->last_endl = 0;
+
             switch(ch) {
                 case MICRORL_ESQ_ANSI_HT: {
 #if MICRORL_CFG_USE_COMPLETE
