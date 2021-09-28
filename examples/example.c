@@ -56,7 +56,8 @@ int main (void/*int argc, char** argv*/) {
 
     while (1) {
         /* Put received char from stdin to microrl instance */
-        microrl_processing_input(prl, get_char(), 1);
+        char ch = get_char();
+        microrl_processing_input(prl, &ch, 1);
     }
     return 0;
 }

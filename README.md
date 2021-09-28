@@ -106,7 +106,7 @@ int main (int argc, char** argv) {
     while (1) {
         /* Put received char from stdin to microrl instance */
         char ch = get_char();
-        microrl_processing_input(&rl, ch, 1);
+        microrl_processing_input(&rl, &ch, 1);
     }
 
     return 0;

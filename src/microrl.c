@@ -347,23 +347,12 @@ static void prv_terminal_print_line(microrl_t* mrl, int32_t pos, uint8_t reset) 
 #endif /* MICRORL_CFG_USE_CARRIAGE_RETURN */
     }
 
-    if (mrl->echo == MICRORL_ECHO_ON) {
-        for (size_t i = pos; i < mrl->cmdlen; ++i) {
-            *j++ = mrl->cmdline[i];
-            if ((j - str) == strlen(str)) {
-                *j = '\0';
-                mrl->out_fn(mrl, str);
-                j = str;
-            }
-        }
-    } else {
-        for (size_t i = pos; i < mrl->cmdlen; ++i) {
-            *j++ = '*';
-            if ((j - str) == strlen(str)) {
-                *j = '\0';
-                mrl->out_fn(mrl, str);
-                j = str;
-            }
+    for (size_t i = pos; i < mrl->cmdlen; ++i) {
+        *j++ = ((i >= mrl->echo_off_pos) && (mrl->echo != MICRORL_ECHO_ON)) ? '*' : mrl->cmdline[i];
+        if ((j - str) == strlen(str)) {
+            *j = '\0';
+            mrl->out_fn(mrl, str);
+            j = str;
         }
     }
 
