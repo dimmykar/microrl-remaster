@@ -243,11 +243,13 @@ inline static void prv_cmdline_buf_reset(microrl_t* mrl) {
 }
 
 /**
- * \brief           Print prompt string defined in \ref MICRORL_CFG_PROMPT_STRING config
+ * \brief           Print prompt string in terminal
  * \param[in]       mrl: \ref microrl_t working instance
  */
-inline static void prv_terminal_prompt(microrl_t* mrl) {
-    mrl->out_fn(mrl, MICRORL_CFG_PROMPT_STRING);
+inline static void prv_terminal_print_prompt(microrl_t* mrl) {
+    mrl->out_fn(mrl, MICRORL_CFG_PROMPT_COLOR);
+    mrl->out_fn(mrl, mrl->prompt);
+    mrl->out_fn(mrl, MICRORL_COLOR_DEFAULT);
 }
 
 /**
@@ -329,21 +331,21 @@ static void prv_terminal_move_cursor(microrl_t* mrl, int32_t offset) {
 
 /**
  * \brief           Print command line buffer to specified position
- * \param[in,out]   mrl: \ref microrl_t working instance
+ * \param[in]       mrl: \ref microrl_t working instance
  * \param[in]       pos: Start position from which the line will be printed
  * \param[in]       reset: Flag to reset the cursor position
  */
 static void prv_terminal_print_line(microrl_t* mrl, int32_t pos, uint8_t reset) {
-    char str[MICRORL_CFG_PRINT_BUFFER_LEN];
+    char str[MICRORL_CFG_PRINT_BUFFER_LEN] = {0};
     char* j = str;
 
     if (reset) {
 #if MICRORL_CFG_USE_CARRIAGE_RETURN
         *j++ = '\r';
-        j = prv_cursor_generate_move(j, MICRORL_CFG_PROMPT_LEN + pos);
+        j = prv_cursor_generate_move(j, strlen(mrl->prompt) + pos);
 #else
-        j = prv_cursor_generate_move(j, -(MICRORL_ARRAYSIZE(mrl->cmdline) - 1 + MICRORL_CFG_PROMPT_LEN + 2));
-        j = prv_cursor_generate_move(j, MICRORL_CFG_PROMPT_LEN + pos);
+        j = prv_cursor_generate_move(j, -(MICRORL_ARRAYSIZE(mrl->cmdline) - 1 + strlen(mrl->prompt) + 2));
+        j = prv_cursor_generate_move(j, strlen(mrl->prompt) + pos);
 #endif /* MICRORL_CFG_USE_CARRIAGE_RETURN */
     }
 
@@ -630,7 +632,7 @@ static microrlr_t prv_handle_newline(microrl_t* mrl) {
         prv_terminal_newline(mrl);
     }
 
-    prv_terminal_prompt(mrl);
+    prv_terminal_print_prompt(mrl);
     prv_cmdline_buf_reset(mrl);
 
     return microrlOK;
@@ -700,7 +702,7 @@ static void prv_microrl_complite_get_input(microrl_t* mrl) {
                 ++i;
             }
             prv_terminal_newline(mrl);
-            prv_terminal_prompt(mrl);
+            prv_terminal_print_prompt(mrl);
             pos = 0;
         }
 
@@ -732,10 +734,11 @@ microrlr_t microrl_init(microrl_t* mrl, microrl_output_fn out_fn, microrl_exec_f
     memset(mrl, 0x00, sizeof(microrl_t));
     mrl->out_fn = out_fn;
     mrl->exec_fn = exec_fn;
+    mrl->prompt = MICRORL_CFG_PROMPT_STRING;
 
-#if MICRORL_CFG_ENABLE_INIT_PROMPT
-    prv_terminal_prompt(mrl);
-#endif /* MICRORL_CFG_ENABLE_INIT_PROMPT */
+#if MICRORL_CFG_PROMPT_ON_INIT
+    prv_terminal_print_prompt(mrl);
+#endif /* MICRORL_CFG_PROMPT_ON_INIT */
 
     mrl->echo = MICRORL_ECHO_ON;
     mrl->echo_off_pos = -1;
@@ -778,6 +781,22 @@ microrlr_t microrl_set_sigint_callback(microrl_t* mrl, microrl_sigint_fn sigint)
     return microrlOK;
 }
 #endif /* MICRORL_CFG_USE_CTRL_C || __DOXYGEN__ */
+
+/**
+ * \brief           Set prompt string
+ * \param[in,out]   mrl: \ref microrl_t working instance
+ * \param[in]       prompt: pointer to prompt string to set
+ * \return          \ref microrlOK on success, member of \ref microrlr_t enumeration otherwise
+ */
+microrlr_t  microrl_set_prompt(microrl_t* mrl, char* prompt) {
+    if (mrl == NULL || prompt == NULL) {
+        return microrlERRPAR;
+    }
+
+    mrl->prompt = prompt;
+    
+    return microrlOK;
+}
 
 /**
  * \brief           Set echo mode used to mask user input
@@ -925,7 +944,7 @@ microrlr_t microrl_processing_input(microrl_t* mrl, const void* in_data, size_t 
                 }
                 case MICRORL_ESQ_ANSI_DC2: { /* ^R */
                     prv_terminal_newline(mrl);
-                    prv_terminal_prompt(mrl);
+                    prv_terminal_print_prompt(mrl);
                     prv_terminal_print_line(mrl, 0, 0);
                     break;
                 }

@@ -151,6 +151,7 @@ typedef struct microrl {
     microrl_sigint_fn sigint_fn;                /*!< Ctrl+C terminal signal callback */
 #endif /* MICRORL_CFG_USE_CTRL_C || __DOXYGEN__ */
 
+    char* prompt;                               /*!< Pointer to prompt string */
     char cmdline[MICRORL_CFG_CMDLINE_LEN + 1];  /*!< Command line input buffer with NULL character */
     size_t cmdlen;                              /*!< Command length in command line buffer */
     size_t cursor;                              /*!< Command line buffer position pointer */
@@ -179,6 +180,7 @@ microrlr_t  microrl_set_complete_callback(microrl_t* mrl, microrl_get_compl_fn g
 microrlr_t  microrl_set_sigint_callback(microrl_t* mrl, microrl_sigint_fn sigint);
 #endif /* MICRORL_CFG_USE_CTRL_C */
 
+microrlr_t  microrl_set_prompt(microrl_t* mrl, char* prompt);
 microrlr_t  microrl_set_echo(microrl_t* mrl, microrl_echo_t echo);
 
 microrlr_t  microrl_processing_input(microrl_t* mrl, const void* in_data, size_t len);

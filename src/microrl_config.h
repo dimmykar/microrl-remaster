@@ -68,20 +68,26 @@ extern "C" {
 #endif
 
 /**
- * \brief           Define you prompt string here. You can use colors escape code, for highlight you prompt,
- *                  for example this prompt will green color (if you terminal supports color)
+ * \brief           Define default prompt string here
  */
 #ifndef MICRORL_CFG_PROMPT_STRING
-#define MICRORL_CFG_PROMPT_STRING             "\033[32mIRin >\033[0m "
-//#define MICRORL_CFG_PROMPT_STRING             "IRin > "
+#define MICRORL_CFG_PROMPT_STRING             "IRin > "
 #endif
 
+#define MICRORL_COLOR_RED                     "\033[31m"
+#define MICRORL_COLOR_GREEN                   "\033[32m"
+#define MICRORL_COLOR_YELLOW                  "\033[33m"
+#define MICRORL_COLOR_BLUE                    "\033[34m"
+#define MICRORL_COLOR_PURPLE                  "\033[35m"
+#define MICRORL_COLOR_MAGENTA                 "\033[36m"
+#define MICRORL_COLOR_WHITE                   "\033[37m"
+#define MICRORL_COLOR_DEFAULT                 "\033[0m"
+
 /**
- * \brief           Define prompt text (without ESC sequence, only text) prompt length, it needs because if you use
- *                  ESC sequence, it's not possible detect only text length
+ * \brief           Use colors escape code, for highlight you prompt, if your terminal supports color
  */
-#ifndef MICRORL_CFG_PROMPT_LEN
-#define MICRORL_CFG_PROMPT_LEN                7
+#ifndef MICRORL_CFG_PROMPT_COLOR
+#define MICRORL_CFG_PROMPT_COLOR              MICRORL_COLOR_GREEN
 #endif
 
 /**
@@ -125,7 +131,7 @@ extern "C" {
 
 /**
  * \brief           Size of the buffer used for piecemeal printing of part or all of the command
- *                  line.  Allocated on the stack.  Must be at least 16.                 
+ *                  line.  Allocated on the stack. Must be at least 16.                 
  */
 #ifndef MICRORL_CFG_PRINT_BUFFER_LEN
 #define MICRORL_CFG_PRINT_BUFFER_LEN          40
@@ -151,7 +157,7 @@ extern "C" {
 
 /**
  * \brief           Use a single carriage return character to move the cursor to the left margin
- *                  rather than moving left by a large number.  This reduces the number of
+ *                  rather than moving left by a large number. This reduces the number of
  *                  characters sent to the terminal, but should be left undefined if the terminal
  *                  will also simulate a linefeed when it receives the carriage return.
  */
@@ -167,13 +173,13 @@ extern "C" {
 #endif
 
 /**
- * \brief           Print prompt at 'microrl_init', if enable, prompt will print at startup, 
+ * \brief           Print prompt at 'microrl_init()'. If enable, prompt will print at startup, 
  *                  otherwise first prompt will print after first press Enter in terminal
- * \note            Enable it, if you call 'microrl_init' after your communication subsystem 
+ * \note            Enable it, if you call 'microrl_init()' after your communication subsystem 
  *                  already initialize and ready to print message
  */
-#ifndef MICRORL_CFG_ENABLE_INIT_PROMPT
-#define MICRORL_CFG_ENABLE_INIT_PROMPT        1
+#ifndef MICRORL_CFG_PROMPT_ON_INIT
+#define MICRORL_CFG_PROMPT_ON_INIT            1
 #endif
 
 /**

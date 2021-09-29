@@ -13,6 +13,7 @@ Changes since [v1.5.1-dev](https://github.com/Helius/microrl/commit/d044bf4300be
     - String output callback function `void print(microrl_t* mrl, const char* str)` replaced with `int out_fn(microrl_t* mrl, const char* str)`
     - Input processing function `void microrl_insert_char(microrl_t* mrl, int ch)` is replaced with `microrlr_t microrl_processing_input(microrl_t* mrl, const void* in_data, size_t len)`
       - New function accepts an array of input data for processing and its length instead of a single character, which can be useful for processing, for example, DMA transfers with ring buffer
+    - Added `microrlr_t  microrl_set_prompt(microrl_t* mrl, char* prompt)` function to set prompt string
     - Added `uint32_t microrl_get_version(void)` function to get version of MicroRL library
 2.  `bool` type defines is removed to prevent compiler warnings
     - Added result enumeration type `microrlr_t` instead
@@ -27,7 +28,9 @@ Changes since [v1.5.1-dev](https://github.com/Helius/microrl/commit/d044bf4300be
     - Using platform-independent `int` types
 4.  Library configurations file changes
     - `config.h` file is renamed to `microrl_config.h`. This file contains MicroRL library default configurations
-    - `microrl_user_config.h` file with user defined configs is created. Copy to this file the configurations that you want to configure from the `microrl_config.h` file and replace it to your project. This way you can easily update the library without affecting your customized configurations.
+    - `microrl_user_config.h` file with user defined configs is created. Copy to this file the configurations that you want to configure from the `microrl_config.h` file and replace it to your project. This way you can easily update the library without affecting your customized configurations
+    - Changed the naming system of configs for forced reconfiguration of the library in accordance with the new changes
+      - Some old configs have been removed, others have changed their meaning
 5.  MicroRL instance changes
     - Command line buffer size changed to `_COMMAND_LINE_LEN + 1` in `microrl_t`. Config `_COMMAND_LINE_LEN` now contains the size of the command line buffer without a terminating zero
 6.  Adapt MicroRL for embedding in C++ programs (`Stephen Casner @slcasner` commits are integrated)
