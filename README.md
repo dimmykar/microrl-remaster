@@ -1,5 +1,7 @@
 # Micro Read Line library for small and embedded devices with basic VT100 support
 
+This library is a remaster of the [microrl](https://github.com/Helius/microrl) library, which author stopped its development in 2017.
+
 ## 1. Description
 
 Microrl library is designed to help implement command line interface in small and embedded devices. Main goal is to write compact, small memory consuming but powerful interfaces, with support navigation through command line with cursor, HOME, END keys, hot key like Ctrl+U and other, history and completion feature.
