@@ -26,11 +26,6 @@
  * Version:         2.0.0-dev
  */
 
-/*
- * BUGS and TODO:
- * -- debug history navigation
- */
-
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -472,16 +467,13 @@ static size_t prv_hist_restore_line(microrl_t* mrl, microrl_hist_rbuf_t* prbuf, 
         ++cnt;
     }
 
-    /* Found record for 'prbuf->count' counter */
+
     size_t ind = prbuf->head;
     size_t j = 0;
+    /* Set navigation counter depending on the direction */
     if (dir == MICRORL_HIST_DIR_UP) {
         if (cnt >= prbuf->count) {
-            while ((cnt - j - 1) != prbuf->count) {
-                prv_hist_next_record(prbuf, &ind);
-                ++j;
-            }
-            if (ind != prbuf->head) {
+            if (cnt != prbuf->count) {
                 ++prbuf->count;
             }
         } else {
@@ -491,15 +483,16 @@ static size_t prv_hist_restore_line(microrl_t* mrl, microrl_hist_rbuf_t* prbuf, 
     } else {
         if (prbuf->count > 0) {
             --prbuf->count;
-
-            while ((cnt - j - 1) != prbuf->count) {
-                prv_hist_next_record(prbuf, &ind);
-                ++j;
-            }
         } else {
             /* Empty line */
             return 0;
         }
+    }
+
+    /* Find record for 'prbuf->count' counter */
+    while ((cnt - j) != prbuf->count) {
+        prv_hist_next_record(prbuf, &ind);
+        ++j;
     }
 
     /* Calculating the length of the found record */
