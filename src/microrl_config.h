@@ -50,18 +50,18 @@ extern "C" {
 /**
  * \brief           Command line length that specifies the size of the command line buffer.
  *                  Set the maximum number of characters. If the user inputs more characters
- *                  than MICRORL_CFG_CMDLINE_LEN, no characters are added to the command line.
+ *                  than MICRORL_CFG_CMDLINE_LEN, no characters are added on the command line.
  */
 #ifndef MICRORL_CFG_CMDLINE_LEN
 #define MICRORL_CFG_CMDLINE_LEN               60
 #endif
 
 /**
- * \brief           Command token number, define max token it command line, if number of token 
- *                  typed in command line exceed this value, then prints message about it and
- *                  command line not to be parced and 'execute' callback will not calls.
- *                  Token is word separate by white space, for example 3 token line:
- *                  "IRin> set mode test"
+ * \brief           Number of tokens in the command. Set the maximum number of tokens on the command line.
+ *                  If the number of tokens typed in the command line exceeds this value, then a message is printed
+ *                  about this, the command line will not be parsed and the 'execute' callback will not be called.
+ *                  Token is a word, that separate by whitespace, for example, line with 3 tokens:
+ *                  "> set mode test"
  */
 #ifndef MICRORL_CFG_CMD_TOKEN_NMB
 #define MICRORL_CFG_CMD_TOKEN_NMB             8
@@ -71,7 +71,7 @@ extern "C" {
  * \brief           Define default prompt string here
  */
 #ifndef MICRORL_CFG_PROMPT_STRING
-#define MICRORL_CFG_PROMPT_STRING             "IRin > "
+#define MICRORL_CFG_PROMPT_STRING             "> "
 #endif
 
 #define MICRORL_COLOR_RED                     "\033[31m"
@@ -91,39 +91,38 @@ extern "C" {
 #endif
 
 /**
- * \brief           Define it, if you wanna use completion functional, also set completion callback in you code,
- *                  now if user press TAB calls 'copmlitetion' callback. If you no need it, you can just set 
- *                  NULL to callback ptr and do not use it, but for memory saving tune, 
- *                  if you are not going to use it - disable this define.
+ * \brief           Enable it, if you want to use completion functional, also set completion callback in you code.
+ *                  Completion functional calls 'copmletion' callback if user press 'TAB'.
  */
 #ifndef MICRORL_CFG_USE_COMPLETE
 #define MICRORL_CFG_USE_COMPLETE              0
 #endif
 
 /**
- * \brief           Define it, if you want to allow quoting command arguments to include spaces.
- *                  Quoting protects whitespace, for example 2 quoted tokens:
- *                  IRin> set wifi "Home Net" "this is a secret"
+ * \brief           Enable it, if you want to allow quoting command arguments to include spaces.
+ *                  Quoting protects whitespace, for example, 2 quoted tokens:
+ *                  "> set wifi "Home Net" "secret password"
  */
 #ifndef MICRORL_CFG_USE_QUOTING
 #define MICRORL_CFG_USE_QUOTING               0
 #endif
 
 /**
- * \brief           Define it, if you wanna use history. It s work's like bash history, and
- *                  set stored value to cmdline, if UP and DOWN key pressed. Using history add
- *                  memory consuming, depends from _RING_HISTORY_LEN parametr
+ * \brief           Enable it, if you want to use history. It works like bash history, and
+ *                  sets stored value to command line, if 'UP' or 'DOWN' key is pressed.
+ *                  Using of history increases memory consumption and depends on the
+ *                  MICRORL_CFG_RING_HISTORY_LEN parameter
  */
 #ifndef MICRORL_CFG_USE_HISTORY
 #define MICRORL_CFG_USE_HISTORY               1
 #endif
 
 /**
- * \brief           History ring buffer length, define static buffer size.
- *                  For saving memory, each entered cmdline store to history in ring buffer,
- *                  so we can not say, how many line we can store, it depends from cmdline len,
- *                  but memory using more effective. We not prefer dinamic memory allocation for
- *                  small and embedded devices. Overhead is 2 char on each saved line
+ * \brief           History ring buffer length. Defines static buffer size.
+ *                  To save memory, each command typed is stored in history ring buffer.
+ *                  So we can not say, how many line we can store, it depends from command line length,
+ *                  but memory using more effective. We not prefer dinamic memory allocation for small and
+ *                  embedded devices. Overhead is 1 char on each saved record (command + terminating zero)
  */
 #ifndef MICRORL_CFG_RING_HISTORY_LEN
 #define MICRORL_CFG_RING_HISTORY_LEN          64
@@ -131,24 +130,25 @@ extern "C" {
 
 /**
  * \brief           Size of the buffer used for piecemeal printing of part or all of the command
- *                  line.  Allocated on the stack. Must be at least 16.                 
+ *                  line buffer. Allocated on the stack. Must be at least 16.                 
  */
 #ifndef MICRORL_CFG_PRINT_BUFFER_LEN
 #define MICRORL_CFG_PRINT_BUFFER_LEN          40
 #endif
 
 /**
- * \brief           Enable Handling terminal ESC sequence. If disabling, then cursor arrow, HOME, END will not work,
- *                  use Ctrl+A(B,F,P,N,A,E,H,K,U,C) see README, but decrease code memory.
+ * \brief           Enable if for handling terminal ESC sequences. If disabled, then cursor arrow,
+ *                  HOME, END will not work. Use Ctrl+A(B,F,P,N,A,E,H,K,U,C). See README.md for more info.
+ *                  This functionality increases the code memory.
  */
 #ifndef MICRORL_CFG_USE_ESC_SEQ
 #define MICRORL_CFG_USE_ESC_SEQ               1
 #endif
 
 /**
- * \brief           Use sprintf from you standard complier library, but it gives some overhead.
- *                  If not defined, use my own number conversion code, it's save about 800 byte of
- *                  code size on AVR (avr-gcc build).
+ * \brief           Enable it for use 'sprintf()' implementation from your compiler's standard library, but
+ *                  this adds some overhead. If not enabled, that uses my own number conversion code,
+ *                  which save about 800 byte of code size on AVR (avr-gcc build).
  *                  Try to build with and without, and compare total code size for tune library.
  */
 #ifndef MICRORL_CFG_USE_LIBC_STDIO
@@ -166,7 +166,7 @@ extern "C" {
 #endif
 
 /**
- * \brief           Enable 'interrupt signal' callback, if user press Ctrl+C
+ * \brief           Enable it and add an 'interrupt signal' callback to invoke it when the user presses Ctrl+C
  */
 #ifndef MICRORL_CFG_USE_CTRL_C
 #define MICRORL_CFG_USE_CTRL_C                0
@@ -174,7 +174,7 @@ extern "C" {
 
 /**
  * \brief           Print prompt at 'microrl_init()'. If enable, prompt will print at startup, 
- *                  otherwise first prompt will print after first press Enter in terminal
+ *                  otherwise first prompt will print after first press 'Enter' in terminal
  * \note            Enable it, if you call 'microrl_init()' after your communication subsystem 
  *                  already initialize and ready to print message
  */
@@ -195,9 +195,9 @@ extern "C" {
  * \}
  */
 
-#define MICRORL_VERSION_MAJOR               2
-#define MICRORL_VERSION_MINOR               0
-#define MICRORL_VERSION_PATCH               0
+#define MICRORL_VERSION_MAJOR                 2
+#define MICRORL_VERSION_MINOR                 0
+#define MICRORL_VERSION_PATCH                 0
 
 #ifdef __cplusplus
 }
