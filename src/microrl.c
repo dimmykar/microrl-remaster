@@ -106,19 +106,17 @@ static microrlr_t prv_cmdline_buf_split(microrl_t* mrl, const char** tkn_arr, ui
 
     /* Process complete string */
     while (*str != '\0') {
-        while (*str == ' ' && ++str) {}     /* Remove leading whitespaces */
+        while (*str == ' ' && ++str) {}         /* Remove leading whitespaces */
         if (*str == '\0') {
             break;
         }
 
 #if MICRORL_CFG_USE_QUOTING
-        /* Check if it starts with quote to handle escapes */
-        if (*str == '"') {
+        if (*str == '"') {                      /* Check if it starts with quote to handle escapes */
             ++str;
-            tkn_arr[num++] = str;     /* Set start of argument after quotes */
+            tkn_arr[num++] = str;               /* Set start of argument after quotes */
 
-            /* Process until end of quote */
-            while (*str != '\0') {
+            while (*str != '\0') {              /* Process until end of quote */
                 if (!((str - mrl->cmdline) < limit)) {
                     tkn_arr[--num] = NULL;
                     *tkn_count = num;
@@ -140,7 +138,7 @@ static microrlr_t prv_cmdline_buf_split(microrl_t* mrl, const char** tkn_arr, ui
             }
         } else {
 #endif /* MICRORL_CFG_USE_QUOTING */
-            tkn_arr[num++] = str;     /* Set start of argument directly on character */
+            tkn_arr[num++] = str;               /* Set start of argument directly on character */
             while ((*str != ' ' && *str != '\0')) {
                 if (!((str - mrl->cmdline) < limit)) {
                     tkn_arr[--num] = NULL;
@@ -148,8 +146,8 @@ static microrlr_t prv_cmdline_buf_split(microrl_t* mrl, const char** tkn_arr, ui
                     return microrlOK;
                 }
 #if MICRORL_CFG_USE_QUOTING
-                if (*str == '"') {          /* Quote should not be here... */
-                    *str = '\0';            /* ...add NULL termination to end token */
+                if (*str == '"') {              /* Quote should not be here... */
+                    *str = '\0';                /* ...add NULL termination to end token */
                 }
 #endif /* MICRORL_CFG_USE_QUOTING */
                 ++str;
@@ -159,8 +157,7 @@ static microrlr_t prv_cmdline_buf_split(microrl_t* mrl, const char** tkn_arr, ui
 #if MICRORL_CFG_USE_QUOTING
         }
 #endif /* MICRORL_CFG_USE_QUOTING */
-        /* Check for number of tokens */
-        if (num == MICRORL_CFG_CMD_TOKEN_NMB && *str != '\0') {
+        if (num == MICRORL_CFG_CMD_TOKEN_NMB && *str != '\0') {     /* Check for number of tokens */
             return microrlERRTKNNUM;
         }
     }
@@ -359,7 +356,7 @@ static void prv_terminal_print_line(microrl_t* mrl, int32_t pos, uint8_t reset) 
         j = str;
     }
 
-    *j++ = '\033';   /* Delete all past end of text */
+    *j++ = '\033';                              /* Delete all past end of text */
     *j++ = '[';
     *j++ = 'K';
     prv_cursor_generate_move(j, mrl->cursor - mrl->cmdlen);
@@ -424,13 +421,11 @@ static void prv_hist_save_line(microrl_hist_rbuf_t* prbuf, char* line, size_t le
         return;
     }
 
-    /* Freeing up space for saving in the ring buffer */
-    while (prv_hist_is_space_for_new(prbuf, len) == MICRORL_HIST_FULL) {
+    while (prv_hist_is_space_for_new(prbuf, len) == MICRORL_HIST_FULL) {    /* Freeing up space for saving in the ring buffer */
         prv_hist_erase_older(prbuf);
     }
 
-    /* Store record */
-    if (len < (MICRORL_ARRAYSIZE(prbuf->ring_buf) - prbuf->tail - 1)) {
+    if (len < (MICRORL_ARRAYSIZE(prbuf->ring_buf) - prbuf->tail - 1)) {     /* Store record */
         memcpy(prbuf->ring_buf + prbuf->tail + 1, line, len);
     } else {
         size_t part_len = MICRORL_ARRAYSIZE(prbuf->ring_buf) - prbuf->tail - 1;
@@ -438,8 +433,7 @@ static void prv_hist_save_line(microrl_hist_rbuf_t* prbuf, char* line, size_t le
         memcpy(prbuf->ring_buf, line + part_len, len - part_len);
     }
 
-    /* Update position pointer and navigation counter */
-    if (prbuf->head == prbuf->tail) {
+    if (prbuf->head == prbuf->tail) {           /* Update position pointer and navigation counter */
         ++prbuf->head;
     }
     prbuf->tail = prbuf->tail + len + 1;
@@ -459,10 +453,9 @@ static void prv_hist_save_line(microrl_hist_rbuf_t* prbuf, char* line, size_t le
  * \return          Size of restored line. `0` is returned, if history is empty
  */
 static size_t prv_hist_restore_line(microrl_t* mrl, microrl_hist_rbuf_t* prbuf, char* line, microrl_hist_dir_t dir) {
-    /* Count history records */
     size_t cnt = 0;
     size_t i = prbuf->head;
-    while (i - 1 != prbuf->tail) {
+    while (i - 1 != prbuf->tail) {              /* Count history records */
         prv_hist_next_record(prbuf, &i);
         ++cnt;
     }
@@ -470,35 +463,30 @@ static size_t prv_hist_restore_line(microrl_t* mrl, microrl_hist_rbuf_t* prbuf, 
 
     size_t ind = prbuf->head;
     size_t j = 0;
-    /* Set navigation counter depending on the direction */
-    if (dir == MICRORL_HIST_DIR_UP) {
+    if (dir == MICRORL_HIST_DIR_UP) {           /* Set navigation counter depending on the direction */
         if (cnt >= prbuf->count) {
             if (cnt != prbuf->count) {
                 ++prbuf->count;
             }
         } else {
-            /* Impossible state, return empty line */
-            return 0;
+            return 0;                           /* Impossible state, return empty line */
         }
     } else {
         if (prbuf->count > 0) {
             --prbuf->count;
         } else {
-            /* Empty line */
-            return 0;
+            return 0;                           /* Empty line */
         }
     }
 
-    /* Find record for 'prbuf->count' counter */
-    while ((cnt - j) != prbuf->count) {
+    while ((cnt - j) != prbuf->count) {         /* Find record for 'prbuf->count' counter */
         prv_hist_next_record(prbuf, &ind);
         ++j;
     }
 
-    /* Calculating the length of the found record */
     size_t rec_len = 0;
     size_t k = ind;
-    while (prbuf->ring_buf[k] != '\0') {
+    while (prbuf->ring_buf[k] != '\0') {        /* Calculating the length of the found record */
         ++k;
         if (k >= MICRORL_ARRAYSIZE(prbuf->ring_buf)) {
             k -= MICRORL_ARRAYSIZE(prbuf->ring_buf);
@@ -506,8 +494,7 @@ static size_t prv_hist_restore_line(microrl_t* mrl, microrl_hist_rbuf_t* prbuf, 
         ++rec_len;
     }
 
-    /* Placing the found record on the command line */
-    memset(line, 0x00, MICRORL_ARRAYSIZE(mrl->cmdline) - 1);
+    memset(line, 0x00, MICRORL_ARRAYSIZE(mrl->cmdline) - 1);    /* Placing the found record on the command line */
     if ((ind + rec_len) < MICRORL_ARRAYSIZE(prbuf->ring_buf)) {
         memcpy(line, prbuf->ring_buf + ind, rec_len);
     } else {
@@ -590,8 +577,7 @@ static uint8_t prv_escape_process(microrl_t* mrl, char ch) {
         }
     }
 
-    /* Unknown escape sequence, stop processing */
-    return 1;
+    return 1;                                   /* Unknown escape sequence, stop processing */
 }
 #endif /* MICRORL_CFG_USE_ESC_SEQ || __DOXYGEN__ */
 
@@ -841,7 +827,7 @@ microrlr_t microrl_processing_input(microrl_t* mrl, const void* in_data, size_t 
                  * triggering a newline.
                  */
                 if (mrl->last_endl == (ch == MICRORL_ESQ_ANSI_CR ? MICRORL_ESQ_ANSI_LF : MICRORL_ESQ_ANSI_CR)) {
-                    mrl->last_endl = 0;      /* Ignore char, but clear newline state */
+                    mrl->last_endl = 0;         /* Ignore char, but clear newline state */
                 } else {
                     mrl->last_endl = ch;
                     prv_handle_newline(mrl);
@@ -951,7 +937,7 @@ microrlr_t microrl_processing_input(microrl_t* mrl, const void* in_data, size_t 
                     break;
                 }
                 default: {
-                    if (((ch == ' ') && (mrl->cmdlen == 0)) || IS_CONTROL_CHAR(ch)) {  /* Skip spaces in first command line symbol or escapes */
+                    if (((ch == ' ') && (mrl->cmdlen == 0)) || IS_CONTROL_CHAR(ch)) {   /* Skip spaces in first command line symbol or escapes */
                         break;
                     }
                     if (prv_cmdline_buf_insert_text(mrl, &ch, 1) == microrlOK) {
@@ -967,7 +953,7 @@ microrlr_t microrl_processing_input(microrl_t* mrl, const void* in_data, size_t 
                             prv_terminal_print_line(mrl, mrl->cursor - 1, 0);
                         }
                     } else {
-                        return microrlERR;    /* Command line is full */
+                        return microrlERR;      /* Command line is full */
                     }
                 }
             }
@@ -988,7 +974,6 @@ microrlr_t microrl_processing_input(microrl_t* mrl, const void* in_data, size_t 
  *                      - [15:8]  Minor version
  *                      - [7:0]   Patch version
  */
-uint32_t microrl_get_version(void)
-{
+uint32_t microrl_get_version(void) {
     return ((MICRORL_VERSION_MAJOR << 16) | (MICRORL_VERSION_MINOR << 8) | (MICRORL_VERSION_PATCH));
 }

@@ -33,11 +33,11 @@ Changes since [v1.5.1-dev](https://github.com/Helius/microrl/commit/d044bf4300be
       - Some old configs have been removed, others have changed their meaning
 5.  MicroRL instance changes
     - Command line buffer size changed to `_COMMAND_LINE_LEN + 1` in `microrl_t`. Config `_COMMAND_LINE_LEN` now contains the size of the command line buffer without a terminating zero
-6.  Adapt MicroRL for embedding in C++ programs (`Stephen Casner @slcasner` commits are integrated)
-    - Add a `void* userdata` member to `microrl_t` struct that can be used by applications to store a C++ object pointer or other context info
-    - Pass the pointer to `microrl_t` in all callbacks so that the operations can be specific to a particular instance of microrl
-    - Add `extern "C"` C++ guards to header files
-7.  Reduce and consolidate print operations (`Stephen Casner @slcasner` commit are integrated)<br>
+6.  MicroRL adaptation for embedding in C++ programs (`Stephen Casner @slcasner` commits are integrated)
+    - Added a `void* userdata` member to `microrl_t` struct that can be used by applications to store a C++ object pointer or other context info
+    - Passed the pointer to `microrl_t` in all callbacks so that the operations can be specific to a particular instance of microrl
+    - Added `extern "C"` C++ guards to header files
+7.  Reduced and consolidated print operations (`Stephen Casner @slcasner` commit are integrated)<br>
     When used over a network connection, each `print()` call in microrl may be transmitted as a separate packet, so the many small print operations make output slow. This commit optimizes some common cases to avoid unnecessary prints and combines others into a buffer to be printed together.
     - When adding characters to the end of a command, now just the single character is output. This avoids cursor jumping. Similarly, when backspacing at the end of the line, just the simple sequence back-one, space, back-one is sufficient.
     - The biggest number of back-to-back print operations occurred in `terminal_print_line()` where each character was printed separately. Now the characters are packed into a temporary buffer first so they can be printed in one or a few operations, depending upon the command length and buffer size. Positioning sequences are also consolidated into the buffer.
