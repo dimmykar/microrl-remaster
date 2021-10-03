@@ -381,3 +381,8 @@ mx.scratch
 
 log_file.txt
 .metadata/
+
+
+# microrl related files
+!examples/esp8266_example/platformio.ini
+!examples/esp8266_example/lib/readme.txt

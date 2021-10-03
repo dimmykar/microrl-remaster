@@ -2,17 +2,19 @@
 
 This library is a remaster of the [microrl](https://github.com/Helius/microrl) library, which author stopped its development in 2017.
 
-## 1. Description
+## Description
 
 Microrl library is designed to help implement command line interface in small and embedded devices. Main goal is to write compact, small memory consuming but powerful interfaces, with support navigation through command line with cursor, HOME, END keys, hot key like Ctrl+U and other, history and completion feature.
 
+<img src="/img/demo.png" alt="Window of terminal with microrl library"/>
 
-## 2. Features
+
+## Features
 
   - `microrl_config.h` and `microrl_user_config.h` files
     * Turn on/off feature for add functional/decrease memory via config files.
 
-  - Pass the pointer to `microrl_t` in all callbacks so that the operations can be specific to a particular instance of microrl
+  - Pass the pointer to `microrl_t` to all callbacks so that the operations can be specific to a particular instance of microrl
 
   - Hot keys support
     * Backspace, cursor arrows, HOME, END keys
@@ -41,11 +43,9 @@ Microrl library is designed to help implement command line interface in small an
   - Echo control
     * Use `microrl_set_echo()` function to turn on or turn off echo.
     * Could be used to print `*` insted of real characters.
-	 
-<img src="/img/demo.png" alt="Window of terminal with microrl library"/>
 
 
-## 3. Source code organization
+## Source code organization
 
 ```
 src/                    - library source
@@ -55,15 +55,17 @@ src/                    - library source
   microrl_user_config.h - customisation config-file
 examples/               - library usage examples
   avr_misc/             - avr specific routines for avr example
+  esp8266_example/      - esp8266 (platformio) example with echo off feature
+  stm32_misc/           - stm32f4 specific routines for stm32 example with full library functionality
   unix_misc/            - unix specific routines for desktop example
-  example.c             - common part of example, for build  demonstrating example for various platform
-  example_misc.h        - interface to platform specific routines for example build (avr, unix)
+  example.c             - common part of example, for build demonstrating example for various platform
+  example_misc.h        - interface to platform specific routines for example build (avr, unix, stm32, esp8266)
   Makefile              - unix example build (gcc)
   Makefile.avr          - avr example build (avr-gcc)
 ```
 
 
-## 4. Install
+## Install
 
 Requirements: C compiler with support for C99 standard (GNU GCC, Keil, IAR) with standard C library (libc, uClibc or other compatible). Also you have to implement several routines in your own code for library to work.
 
@@ -119,8 +121,8 @@ See examples of library usage.
 
 
 
-Author: Eugene Samoylov aka Helius (ghelius@gmail.com)
+Author: Eugene Samoylov aka Helius (ghelius@gmail.com)<br>
 01.09.2011
 
-Remastered by: Dmitry Karasev aka dimmykar (karasevsdmitry@yandex.ru)
+Remastered by: Dmitry Karasev aka dimmykar (karasevsdmitry@yandex.ru)<br>
 27.09.2021

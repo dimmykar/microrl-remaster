@@ -246,6 +246,6 @@ char ** complet(microrl_t* mrl, int argc, const char* const *argv) {
  * \param[in]       mrl: \ref microrl_t working instance
  */
 void sigint(microrl_t* mrl) {
-    print(mrl, "^C is catched!\n\r");
+    print(mrl, "^C is caught!\n\r");
 }
 #endif /* MICRORL_CFG_USE_CTRL_C || __DOXYGEN__ */

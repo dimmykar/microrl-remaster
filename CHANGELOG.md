@@ -61,4 +61,7 @@ Changes since [v1.5.1-dev](https://github.com/Helius/microrl/commit/d044bf4300be
     - It is now possible to use the history ring buffer larger than 256 bytes
       - Stored records in the buffer no longer contain the record length in first byte. Only null-terminated strings are stored in the buffer. This is done at the cost of a slight increase in the resource requirements of the target system.
 13. Added an explanations into README.md with Markdown formatting
-14. Found bugs were fixed, and, of course, new ones were added ;)
+14. Added new examples
+    - STM32 example with full library functionality
+    - ESP8266 platformio example by `Maksim Chichikalov @m-chichikalov` with echo off feature
+15. Found bugs were fixed, and, of course, new ones were added ;)

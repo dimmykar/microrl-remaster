@@ -176,25 +176,26 @@ int execute(microrl_t* mrl, int argc, const char* const *argv) {
                 int val = strcmp(argv[i - 1], _CMD_CLR);
                 unsigned char* port = NULL;
                 int pin = 0;
-            if (strcmp(argv[i], _SCMD_PD) == 0) {
-                port = (unsigned char*)&PORTD;
-            } else if (strcmp(argv[i], _SCMD_PB) == 0) {
-                port = (unsigned char*)&PORTB;
-            } else {
-                print(mrl, "only '");
-                print(mrl, _SCMD_PB);
-                print(mrl, "' and '");
-                print(mrl, _SCMD_PD);
-                print(mrl, "' support"_ENDLINE_SEQ);
-                return 1;
-            }
-            if (++i < argc) {
-                pin = atoi(argv[i]);
-                set_port_val(port, pin, val);
-                return 0;
-            } else {
-                print(mrl, "specify pin number, use Tab"_ENDLINE_SEQ);
-                return 1;
+                if (strcmp(argv[i], _SCMD_PD) == 0) {
+                    port = (unsigned char*)&PORTD;
+                } else if (strcmp(argv[i], _SCMD_PB) == 0) {
+                    port = (unsigned char*)&PORTB;
+                } else {
+                    print(mrl, "only '");
+                    print(mrl, _SCMD_PB);
+                    print(mrl, "' and '");
+                    print(mrl, _SCMD_PD);
+                    print(mrl, "' support"_ENDLINE_SEQ);
+                    return 1;
+                }
+                if (++i < argc) {
+                    pin = atoi(argv[i]);
+                    set_port_val(mrl, port, pin, val);
+                    return 0;
+                } else {
+                    print(mrl, "specify pin number, use Tab"_ENDLINE_SEQ);
+                    return 1;
+                }
             }
         } else {
             print(mrl, "command: '");
@@ -260,6 +261,6 @@ char ** complet(microrl_t* mrl, int argc, const char* const *argv) {
  * \param[in]       mrl: \ref microrl_t working instance
  */
 void sigint(microrl_t* mrl) {
-    print(mrl, "^C is catched!"_ENDLINE_SEQ);
+    print(mrl, "^C is caught!"_ENDLINE_SEQ);
 }
 #endif /* MICRORL_CFG_USE_CTRL_C || __DOXYGEN__ */
