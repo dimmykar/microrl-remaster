@@ -23,7 +23,7 @@
  *
  * Authors:         Eugene SAMOYLOV aka Helius <ghelius@gmail.com>,
  *                  Dmitry KARASEV <karasevsdmitry@yandex.ru>
- * Version:         2.0.0-dev
+ * Version:         2.0.0
  */
 
 #include <stdint.h>
