@@ -691,7 +691,13 @@ static void prv_microrl_complite_get_input(microrl_t* mrl) {
             if (compl_token[1] == NULL) {
               prv_cmdline_buf_insert_text(mrl, " ", 1);
             }
+
+            /* Restore whitespaces replaced with '0' when command line buffer was split */
+            for (size_t i = 0; i < tkn_count - 1; ++i) {
+                memset((void*)tkn_arr[i] + strlen(tkn_arr[i]), ' ', 1);
+            }
         }
+
         prv_terminal_print_line(mrl, pos, 0);
     }
 }
