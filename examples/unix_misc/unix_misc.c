@@ -21,7 +21,7 @@
  * This file is part of MicroRL - Micro Read Line library for small and embedded devices.
  *
  * Author:          Eugene SAMOYLOV aka Helius <ghelius@gmail.com>
- * Version:         2.0.0
+ * Version:         2.1.0-dev
  */
 
 #include <termios.h>
