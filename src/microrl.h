@@ -173,6 +173,8 @@ typedef struct microrl {
 } microrl_t;
 
 microrlr_t  microrl_init(microrl_t* mrl, microrl_output_fn out_fn, microrl_exec_fn exec_fn);
+
+microrlr_t  microrl_set_execute_callback(microrl_t* mrl, microrl_exec_fn exec_fn);
 #if MICRORL_CFG_USE_COMPLETE
 microrlr_t  microrl_set_complete_callback(microrl_t* mrl, microrl_get_compl_fn get_completion);
 #endif /* MICRORL_CFG_USE_COMPLETE */

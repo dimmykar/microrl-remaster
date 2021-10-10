@@ -731,6 +731,22 @@ microrlr_t microrl_init(microrl_t* mrl, microrl_output_fn out_fn, microrl_exec_f
     return microrlOK;
 }
 
+/**
+ * \brief           Set pointer to command execute callback, that called when user press 'Enter'
+ * \param[in,out]   mrl: \ref microrl_t working instance
+ * \param[in]       exec_fn: Command execute callback
+ * \return          \ref microrlOK on success, member of \ref microrlr_t enumeration otherwise
+ */
+microrlr_t microrl_set_execute_callback(microrl_t* mrl, microrl_exec_fn exec_fn) {
+    if (mrl == NULL || exec_fn == NULL) {
+        return microrlERRPAR;
+    }
+
+    mrl->exec_fn = exec_fn;
+
+    return microrlOK;
+}
+
 #if MICRORL_CFG_USE_COMPLETE || __DOXYGEN__
 /**
  * \brief           Set pointer to input complition callback, that called when user press 'Tab'
