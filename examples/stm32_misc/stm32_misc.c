@@ -38,7 +38,7 @@
 #define UART_RX_Pin                 LL_GPIO_PIN_11
 #define UART_RX_GPIO_Port           GPIOC
 
-#define _STM32_DEMO_VER             "1.0"
+#define _STM32_DEMO_VER             "1.1"
 
 #define _ENDLINE_SEQ                "\r\n"
 
@@ -70,7 +70,7 @@ uint32_t device_sn = 0;
 
 /* Session status flags */
 uint8_t  logged_in = 0;
-uint8_t  password = 0;
+uint8_t  passw_in = 0;
 
 /**
  * \brief           Init STM32F4 platform
@@ -208,22 +208,22 @@ void str_to_u32(char* str, uint32_t* val) {
  */
 void u32_to_str(uint32_t* val, char* str) {
     uint32_t v = *val;
-    uint32_t s = 0;
+    size_t s = 0;
     char t;
 
-    uint32_t n;
+    size_t n;
     for (n = 0; v > 0; v /= 10) {
         str[s + n++] = "0123456789"[v % 10];
     }
     
     /* Reverse a string */
-    for (uint32_t i = 0; i < n / 2; ++i) {
+    for (size_t i = 0; i < n / 2; ++i) {
         t = str[s + i];
         str[s + i] = str[s + n - i - 1];
         str[s + n - i - 1] = t;
     }
     
-    if (val == 0) {
+    if (val == NULL) {
         str[n++] = '0';  /* Handle special case */
     }
 }
@@ -274,7 +274,51 @@ void save_sernum(microrl_t* mrl) {
 }
 
 /**
- * \brief           Execute callback for MicroRL library
+ * \brief           Command execute callback for MicroRL library, used after log in
+ *
+ * Do what you want here, but don't write to argv!!! read only!!
+ *
+ * \param[in]       mrl: \ref microrl_t working instance
+ * \param[in]       argc: argument count
+ * \param[in]       argv: pointer array to token string
+ * \return          '0' on success, '1' otherwise. Not used by library
+ */
+int execute_main(microrl_t* mrl, int argc, const char* const *argv) {
+    size_t i = 0;
+
+    /* Just iterate through argv word and compare it with your commands */
+    while (i < argc) {
+        if (strcmp(argv[i], _CMD_HELP) == 0) {
+            print_help(mrl);
+        } else if (strcmp(argv[i], _CMD_CLEAR) == 0) {
+            clear_screen(mrl);
+        } else if (strcmp(argv[i], _CMD_SERNUM) == 0) {
+            if (++i < argc) {
+                if (strcmp(argv[i], _SCMD_RD) == 0) {
+                    read_sernum(mrl);
+                } else if (strcmp(argv[i], _SCMD_SAVE) == 0) {
+                    save_sernum(mrl);
+                } else {
+                    set_sernum(mrl, (char*)argv[i]);
+                }
+            } else {
+                print(mrl, "Read or specify serial number, use Tab"_ENDLINE_SEQ);
+                return 1;
+            }
+        } else {
+            print(mrl, "\tCommand: '");
+            print(mrl, (char*)argv[i]);
+            print(mrl, "' not found."_ENDLINE_SEQ);
+            return 1;
+        }
+        ++i;
+    }
+
+    return 0;
+}
+
+/**
+ * \brief           Log in execute callback for MicroRL library
  *
  * Do what you want here, but don't write to argv!!! read only!!
  *
@@ -287,69 +331,41 @@ int execute(microrl_t* mrl, int argc, const char* const *argv) {
     size_t i = 0;
 
     /* Just iterate through argv word and compare it with your commands */
-    if (!logged_in) {
-        while (i < argc) {
-            if (strcmp(argv[i], "login") == 0) {
-                if (++i < argc) {
-                    if (strcmp (argv[i], SESSION_ADMIN_LOGIN) == 0) {
-                        print(mrl, "\tEnter your password:"_ENDLINE_SEQ);
-                        microrl_set_echo(mrl, MICRORL_ECHO_ONCE);
-                        password = 1;
-                        return 0;
-                    } else {
-                        print(mrl, "\tWrong login name. Try again."_ENDLINE_SEQ);
-                        return 1;
-                    }
-                } else {
-                    print(mrl, "\tEnter your login after 'login' command."_ENDLINE_SEQ);
-                    return 0;
-                }
-            } else if (password == 1) {
-                if (strcmp(argv[i], SESSION_ADMIN_PASSW) == 0) {
-                    print(mrl, "\tSuccess! You are logged in"_ENDLINE_SEQ);
-                    password = 0;
-                    logged_in = 1;
+    while (i < argc) {
+        if (strcmp(argv[i], "login") == 0) {
+            if (++i < argc) {
+                if (strcmp (argv[i], SESSION_ADMIN_LOGIN) == 0) {
+                    print(mrl, "\tEnter your password:"_ENDLINE_SEQ);
+                    microrl_set_echo(mrl, MICRORL_ECHO_ONCE);
+                    passw_in = 1;
                     return 0;
                 } else {
-                    print(mrl, "\tWrong password. Try log in again."_ENDLINE_SEQ);
-                    password = 0;
-                    return 1;
-                }
-            } else if (strcmp(argv[i], _CMD_HELP) == 0) {
-                print_help(mrl);
-            } else {
-                print(mrl, "\tType 'help' to list commands"_ENDLINE_SEQ);
-                return 1;
-            }
-            ++i;
-        }
-    } else {
-        while (i < argc) {
-            if (strcmp(argv[i], _CMD_HELP) == 0) {
-                print_help(mrl);
-            } else if (strcmp(argv[i], _CMD_CLEAR) == 0) {
-                clear_screen(mrl);
-            } else if (strcmp(argv[i], _CMD_SERNUM) == 0) {
-                if (++i < argc) {
-                    if (strcmp(argv[i], _SCMD_RD) == 0) {
-                        read_sernum(mrl);
-                    } else if (strcmp(argv[i], _SCMD_SAVE) == 0) {
-                        save_sernum(mrl);
-                    } else {
-                        set_sernum(mrl, (char*)argv[i]);
-                    }
-                } else {
-                    print(mrl, "Read or specify serial number, use Tab"_ENDLINE_SEQ);
+                    print(mrl, "\tWrong login name. Try again."_ENDLINE_SEQ);
                     return 1;
                 }
             } else {
-                print(mrl, "\tCommand: '");
-                print(mrl, (char*)argv[i]);
-                print(mrl, "' not found."_ENDLINE_SEQ);
+                print(mrl, "\tEnter your login after 'login' command."_ENDLINE_SEQ);
+                return 0;
+            }
+        } else if (passw_in == 1) {
+            if (strcmp(argv[i], SESSION_ADMIN_PASSW) == 0) {
+                print(mrl, "\tSuccess! You are logged in"_ENDLINE_SEQ);
+                passw_in = 0;
+                logged_in = 1;
+                microrl_set_execute_callback(mrl, execute_main);
+                return 0;
+            } else {
+                print(mrl, "\tWrong password. Try log in again."_ENDLINE_SEQ);
+                passw_in = 0;
                 return 1;
             }
-            ++i;
+        } else if (strcmp(argv[i], _CMD_HELP) == 0) {
+            print_help(mrl);
+        } else {
+            print(mrl, "\tType 'help' to list commands"_ENDLINE_SEQ);
+            return 1;
         }
+        ++i;
     }
 
     return 0;
