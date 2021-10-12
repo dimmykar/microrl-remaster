@@ -3,12 +3,14 @@
 
 ## Develop
 
+
+## v2.1.0
+
 1.  Set execute callback function `microrlr_t microrl_set_execute_callback(microrl_t* mrl, microrl_exec_fn exec_fn)` from [v1.5.1-dev](https://github.com/Helius/microrl/commit/d044bf4300be57b1d6b298a794d5af7c51cf4de8) is restored
     - This function may be useful to switch multiple execution callbacks: for example, one for entering a login and password, another for execution commands after log in
 2.  Updated STM32 example with two execute callbacks
 3.  Added optional command status logging
     - Enable `MICRORL_CFG_EXECUTE_STATUS_LOGGING` to output command exiting status, if it is not equal 0
-
 
 
 ## v2.0.0
