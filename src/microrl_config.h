@@ -166,6 +166,13 @@ extern "C" {
 #endif
 
 /**
+ * \brief           Enable it to output command exiting status, if it is not equal 0
+ */
+#ifndef MICRORL_CFG_EXECUTE_STATUS_LOGGING
+#define MICRORL_CFG_EXECUTE_STATUS_LOGGING    0
+#endif
+
+/**
  * \brief           Enable it and add an 'interrupt signal' callback to invoke it when the user presses Ctrl+C
  */
 #ifndef MICRORL_CFG_USE_CTRL_C

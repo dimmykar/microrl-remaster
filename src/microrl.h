@@ -117,7 +117,7 @@ typedef int       (*microrl_output_fn)(struct microrl* mrl, const char* str);
  * \param[in]       mrl: microRL working instance
  * \param[in]       argc: argument count
  * \param[in]       argv: pointer array to token string
- * \return          '0' on success, '1' otherwise. Not used by library
+ * \return          '0' on success, '1' otherwise
  */
 typedef int       (*microrl_exec_fn)(struct microrl* mrl, int argc, const char* const *argv);
 

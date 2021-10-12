@@ -151,7 +151,7 @@ void set_port_val(microrl_t* mrl, unsigned char* port, int pin, int val) {
  * \param[in]       mrl: \ref microrl_t working instance
  * \param[in]       argc: argument count
  * \param[in]       argv: pointer array to token string
- * \return          '0' on success, '1' otherwise. Not used by library
+ * \return          '0' on success, '1' otherwise
  */
 int execute(microrl_t* mrl, int argc, const char* const *argv) {
     int i = 0;

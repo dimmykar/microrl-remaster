@@ -605,7 +605,42 @@ static microrlr_t prv_handle_newline(microrl_t* mrl) {
 
     status = prv_cmdline_buf_split(mrl, tkn_arr, &tkn_count, mrl->cmdlen);
     if (status == microrlOK) {
+#if MICRORL_CFG_EXECUTE_STATUS_LOGGING
+        int exec_status = 0;
+        exec_status = mrl->exec_fn(mrl, tkn_count, tkn_arr);
+        if (exec_status != 0) {
+            char str[11] = {0};
+#if MICRORL_CFG_USE_LIBC_STDIO
+            snprintf(str, 11, "%d", exec_status);
+#else
+            int v = exec_status;
+            size_t s = 0;
+            char t;
+
+            if (v < 0) {
+                str[s++] = '-';
+                v = -v;
+            }
+
+            size_t n;
+            for (n = 0; v > 0; v /= 10) {
+                str[s + n++] = "0123456789"[v % 10];
+            }
+
+            /* Reverse a string */
+            for (size_t i = 0; i < n / 2; ++i) {
+                t = str[s + i];
+                str[s + i] = str[s + n - i - 1];
+                str[s + n - i - 1] = t;
+            }
+#endif /* MICRORL_CFG_USE_LIBC_STDIO */
+            mrl->out_fn(mrl, "Command exited with status ");
+            mrl->out_fn(mrl, str);
+            prv_terminal_newline(mrl);
+        }
+#else
         mrl->exec_fn(mrl, tkn_count, tkn_arr);
+#endif /* MICRORL_CFG_EXECUTE_STATUS_LOGGING */
     } else {
         mrl->out_fn(mrl, "ERROR: too many tokens");
         prv_terminal_newline(mrl);
