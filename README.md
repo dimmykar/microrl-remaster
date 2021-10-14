@@ -56,7 +56,7 @@ src/                    - library source
 examples/               - library usage examples
   avr_misc/             - avr specific routines for avr example
   esp8266_example/      - esp8266 (platformio) example with echo off feature
-  stm32_misc/           - stm32f4 specific routines for stm32 example with full library functionality
+  stm32_example/        - stm32 (STM32CubeIDE) example with full library functionality
   unix_misc/            - unix specific routines for desktop example
   example.c             - common part of example, for build demonstrating example for various platform
   example_misc.h        - interface to platform specific routines for example build (avr, unix, stm32, esp8266)

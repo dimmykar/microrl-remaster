@@ -3,6 +3,8 @@
 
 ## Develop
 
+1.  Added pre-configured STM32CubeIDE project with library demonstration example for STM32F415RG MCU
+
 
 ## v2.1.0
 
