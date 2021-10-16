@@ -49,7 +49,7 @@
 									<listOptionValue builtIn="false" value="../../src/st/stm32f4xx/ll"/>
 									<listOptionValue builtIn="false" value="../../src/st/stm32f4xx/stm32f415"/>
 									<listOptionValue builtIn="false" value="../../src/st/stm32f4xx/stm32f415/cmsis"/>
-									<listOptionValue builtIn="false" value="../../../../src"/>
+									<listOptionValue builtIn="false" value="../../../../src/include/microrl"/>
 								</option>
 								<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.option.languagestandard.281840884" name="Language standard" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.option.languagestandard" useByScannerDiscovery="true" value="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.option.languagestandard.value.isoc99" valueType="enumerated"/>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.1144481635" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
@@ -129,7 +129,7 @@
 									<listOptionValue builtIn="false" value="../../src/st/stm32f4xx/ll"/>
 									<listOptionValue builtIn="false" value="../../src/st/stm32f4xx/stm32f415"/>
 									<listOptionValue builtIn="false" value="../../src/st/stm32f4xx/stm32f415/cmsis"/>
-									<listOptionValue builtIn="false" value="../../../../src"/>
+									<listOptionValue builtIn="false" value="../../../../src/include/microrl"/>
 								</option>
 								<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.option.languagestandard.1264096831" name="Language standard" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.option.languagestandard" useByScannerDiscovery="true" value="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.option.languagestandard.value.isoc99" valueType="enumerated"/>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.1244600938" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>

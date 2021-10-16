@@ -48,20 +48,22 @@ Microrl library is designed to help implement command line interface in small an
 ## Source code organization
 
 ```
-src/                    - library source
-  microrl.c             - microrl routines
-  microrl.h             - lib interface and data type
-  microrl_config.h      - file with default configs
-  microrl_user_config.h - customisation config-file
-examples/               - library usage examples
-  avr_misc/             - avr specific routines for avr example
-  esp8266_example/      - esp8266 (platformio) example with echo off feature
-  stm32_example/        - stm32 (STM32CubeIDE) example with full library functionality
-  unix_misc/            - unix specific routines for desktop example
-  example.c             - common part of example, for build demonstrating example for various platform
-  example_misc.h        - interface to platform specific routines for example build (avr, unix, stm32, esp8266)
-  Makefile              - unix example build (gcc)
-  Makefile.avr          - avr example build (avr-gcc)
+src/                             - library sources
+src/microrl
+  microrl.c                      - microrl routines
+src/include/microrl
+  microrl.h                      - lib interface and data type
+  microrl_config.h               - file with default configs
+  microrl_user_config_template.h - customisation config-file template
+examples/                        - library usage examples
+  avr_misc/                      - avr specific routines for avr example
+  esp8266_example/               - esp8266 (platformio) example with echo off feature
+  stm32_example/                 - stm32 (STM32CubeIDE) example with full library functionality
+  unix_misc/                     - unix specific routines for desktop example
+  example.c                      - common part of example, for build demonstrating example for various platform
+  example_misc.h                 - interface to platform specific routines for example build (avr, unix, stm32, esp8266)
+  Makefile                       - unix example build (gcc)
+  Makefile.avr                   - avr example build (avr-gcc)
 ```
 
 
@@ -88,7 +90,7 @@ Execute callback pointer give a `argc`, `argv` parametrs, like `main()` func in 
 
 c) If you want completion support if user press TAB key, call `microrl_set_complete_callback()` and set you callback. It also give `argc` and `argv` arguments, so iterate through it and return set of complete variants.
 
-d) Look at `microrl_config.h` file and tune library in `microrl_user_config.h`. To do this, copy the default configs from `microrl_config.h` to `microrl_user_config.h` and change them for you requiring. Then you can replace `microrl_user_config.h` to your project.
+d) Rename `microrl_user_config_template.h` to `microrl_user_config.h`. Look at `microrl_config.h` file and tune library in `microrl_user_config.h`. To do this, copy the default configs from `microrl_config.h` to `microrl_user_config.h` and change them for you requiring. Then replace `microrl_user_config.h` to libraries confuguration folder of your project.
 
 e) Now you just call `microrl_processing_input()` on each input string (or one char) received from input stream (usart, network, etc).
 

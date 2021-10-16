@@ -1,5 +1,5 @@
 /**
- * \file            microrl_user_config.h
+ * \file            microrl_user_config_template.h
  * \brief           MicroRL library user configurations
  */
 
@@ -30,6 +30,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
+
+/* Rename this file to "microrl_user_config.h" for your application */
 
 /*
  * Open "microrl_config.h" and copy & replace 
