@@ -62,6 +62,8 @@ typedef enum {
     microrlERR = 0x01,                           /*!< Common error */
     microrlERRPAR = 0x02,                        /*!< Parameter error */
     microrlERRTKNNUM = 0x03,                     /*!< Too many tokens */
+    microrlERRCLFULL = 0x04,                     /*!< Command line is full */
+    microrlERRCPLT = 0x05                        /*!< Auto-completion error */
 } microrlr_t;
 
 /**

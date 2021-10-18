@@ -191,7 +191,7 @@ static microrlr_t prv_cmdline_buf_insert_text(microrl_t* mrl, const char* text, 
         return microrlOK;
     }
 
-    return microrlERR;
+    return microrlERRCLFULL;
 }
 
 /**
@@ -624,7 +624,7 @@ static microrlr_t prv_handle_newline(microrl_t* mrl) {
     prv_terminal_print_prompt(mrl);
     prv_cmdline_buf_reset(mrl);
 
-    return microrlOK;
+    return status;
 }
 
 #if MICRORL_CFG_USE_COMPLETE || __DOXYGEN__
@@ -661,14 +661,15 @@ static size_t prv_complite_total_len(char** arr) {
  * \brief           Auto-complete activities to complete input in
  *                      command line
  * \param[in,out]   mrl: \ref microrl_t working instance
+ * \return          \ref microrlOK on success, member of \ref microrlr_t enumeration otherwise
  */
-static void prv_microrl_complite_get_input(microrl_t* mrl) {
+static microrlr_t prv_microrl_complite_get_input(microrl_t* mrl) {
     uint8_t tkn_count = 0;
     const char* tkn_arr[MICRORL_CFG_CMD_TOKEN_NMB] = {0};
     char** compl_token;
 
     if (prv_cmdline_buf_split(mrl, tkn_arr, &tkn_count, mrl->cursor) != microrlOK) {
-        return;
+        return microrlERRCPLT;
     }
 
     if (mrl->cmdline[mrl->cursor - 1] == ' ') {
@@ -699,7 +700,7 @@ static void prv_microrl_complite_get_input(microrl_t* mrl) {
             prv_cmdline_buf_insert_text(mrl, compl_token[0] + strlen(tkn_arr[tkn_count - 1]),
                                         len - strlen(tkn_arr[tkn_count - 1]));
             if (compl_token[1] == NULL) {
-              prv_cmdline_buf_insert_text(mrl, " ", 1);
+                prv_cmdline_buf_insert_text(mrl, " ", 1);
             }
 
             /* Restore whitespaces replaced with '0' when command line buffer was split */
@@ -709,7 +710,11 @@ static void prv_microrl_complite_get_input(microrl_t* mrl) {
         }
 
         prv_terminal_print_line(mrl, pos, 0);
+    } else {
+        return microrlERRCPLT;
     }
+
+    return microrlOK;
 }
 
 #endif /* MICRORL_CFG_USE_COMPLETE || __DOXYGEN__ */
@@ -862,7 +867,9 @@ microrlr_t microrl_processing_input(microrl_t* mrl, const void* in_data, size_t 
                     mrl->last_endl = 0;         /* Ignore char, but clear newline state */
                 } else {
                     mrl->last_endl = ch;
-                    prv_handle_newline(mrl);
+                    if (prv_handle_newline(mrl) != microrlOK) {
+                        return microrlERRTKNNUM;
+                    }
                 }
                 continue;
             }
@@ -874,7 +881,9 @@ microrlr_t microrl_processing_input(microrl_t* mrl, const void* in_data, size_t 
                     if (mrl->get_completion_fn == NULL) {
                         return microrlERRPAR;
                     }
-                    prv_microrl_complite_get_input(mrl);
+                    if (prv_microrl_complite_get_input(mrl) != microrlOK) {
+                        return microrlERRCPLT;
+                    }
 #endif /* MICRORL_CFG_USE_COMPLETE */
                     break;
                 }
@@ -985,7 +994,7 @@ microrlr_t microrl_processing_input(microrl_t* mrl, const void* in_data, size_t 
                             prv_terminal_print_line(mrl, mrl->cursor - 1, 0);
                         }
                     } else {
-                        return microrlERR;      /* Command line is full */
+                        return microrlERRCLFULL;
                     }
                 }
             }
