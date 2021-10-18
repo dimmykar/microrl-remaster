@@ -34,6 +34,29 @@
 #include <stdio.h>
 #endif /* MICRORL_CFG_USE_LIBC_STDIO */
 
+/* GNU Compiler */
+#if defined(__GNUC__)
+#define __INLINE__                          inline
+/* IAR Compiler */
+#elif defined(__ICCARM__)
+#define __INLINE__                          inline
+/* TI Arm Compiler */
+#elif defined ( __TI_ARM__ )
+#define __INLINE__                          inline
+/* Arm Compiler 4/5 */
+#elif defined(__CC_ARM)
+#define __INLINE__                          __inline
+/* Arm Compiler 6.6 LTM (armclang) */
+#elif defined (__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050) && (__ARMCC_VERSION < 6100100)
+#define __INLINE__                          __inline
+/* Arm Compiler above 6.10.1 (armclang) */
+#elif defined (__ARMCC_VERSION) && (__ARMCC_VERSION >= 6100100)
+#define __INLINE__                          __inline
+#else
+#define __INLINE__
+#warning "Unknown compiler. 'inline' keyword is not set"
+#endif /* defined(__GNUC__) */
+
 #define IS_CONTROL_CHAR(x)                  ((x) <= 31)
 
 /**
@@ -228,7 +251,7 @@ static void prv_cmdline_buf_delete(microrl_t* mrl) {
  * \brief           Reset command line buffer and its position pointers
  * \param[out]      mrl: \ref microrl_t working instance
  */
-inline static void prv_cmdline_buf_reset(microrl_t* mrl) {
+static __INLINE__ void prv_cmdline_buf_reset(microrl_t* mrl) {
     memset(mrl->cmdline, 0x00, sizeof(mrl->cmdline));
     mrl->cmdlen = 0;
     mrl->cursor = 0;
@@ -238,7 +261,7 @@ inline static void prv_cmdline_buf_reset(microrl_t* mrl) {
  * \brief           Print prompt string in terminal
  * \param[in]       mrl: \ref microrl_t working instance
  */
-inline static void prv_terminal_print_prompt(microrl_t* mrl) {
+static __INLINE__ void prv_terminal_print_prompt(microrl_t* mrl) {
     mrl->out_fn(mrl, MICRORL_CFG_PROMPT_COLOR);
     mrl->out_fn(mrl, mrl->prompt);
     mrl->out_fn(mrl, MICRORL_COLOR_DEFAULT);
@@ -249,7 +272,7 @@ inline static void prv_terminal_print_prompt(microrl_t* mrl) {
  *                      and move the cursor to its position
  * \param[in]       mrl: \ref microrl_t working instance
  */
-inline static void prv_terminal_backspace(microrl_t* mrl) {
+static __INLINE__ void prv_terminal_backspace(microrl_t* mrl) {
     mrl->out_fn(mrl, "\033[D \033[D");
 }
 
@@ -257,7 +280,7 @@ inline static void prv_terminal_backspace(microrl_t* mrl) {
  * \brief           Print end line symbol defined in \ref MICRORL_CFG_END_LINE config
  * \param[in]       mrl: \ref microrl_t working instance
  */
-inline static void prv_terminal_newline(microrl_t* mrl) {
+static __INLINE__ void prv_terminal_newline(microrl_t* mrl) {
     mrl->out_fn(mrl, MICRORL_CFG_END_LINE);
 }
 
@@ -370,7 +393,7 @@ static void prv_terminal_print_line(microrl_t* mrl, int32_t pos, uint8_t reset) 
  * \param[in]       prbuf: Pointer to \ref microrl_hist_rbuf_t structure
  * \param[in,out]   index: Pointer to the current record
  */
-inline static void prv_hist_next_record(microrl_hist_rbuf_t* prbuf, size_t* index) {
+__INLINE__ static void prv_hist_next_record(microrl_hist_rbuf_t* prbuf, size_t* index) {
     while (prbuf->ring_buf[*index] != '\0') {
         ++(*index);
         if (*index >= MICRORL_ARRAYSIZE(prbuf->ring_buf)) {
