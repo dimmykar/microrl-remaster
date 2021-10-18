@@ -38,7 +38,7 @@
 #define UART_RX_Pin                 LL_GPIO_PIN_11
 #define UART_RX_GPIO_Port           GPIOC
 
-#define _STM32_DEMO_VER             "1.1"
+#define _STM32_DEMO_VER             "1.2"
 
 #define _ENDLINE_SEQ                "\r\n"
 
@@ -427,3 +427,26 @@ void sigint(microrl_t* mrl) {
     print(mrl, "^C is caught!"_ENDLINE_SEQ);
 }
 #endif /* MICRORL_CFG_USE_CTRL_C || __DOXYGEN__ */
+
+#if MICRORL_CFG_USE_COMMAND_HOOKS
+/**
+ * \brief           Hook called after command execution callback
+ * \param[in,out]   mrl: \ref microrl_t working instance
+ * \param[in]       res: Return value of the command execution callback
+ * \param[in]       argc: Number of arguments in command line
+ * \param[in]       argv: Pointer to argument list
+ */
+void post_exec_hook(microrl_t* mrl, int res, int argc, const char* const *argv) {
+    if (res != 0) {
+        char str[11] = {0};
+#if MICRORL_CFG_USE_LIBC_STDIO
+        snprintf(str, 11, "%d", res);
+#else
+        u32_to_str((uint32_t*)&res, str);
+#endif /* MICRORL_CFG_USE_LIBC_STDIO */
+        print(mrl, "Command exited with status ");
+        print(mrl, str);
+        print(mrl, _ENDLINE_SEQ);
+  }
+}
+#endif /* MICRORL_CFG_USE_COMMAND_HOOKS */

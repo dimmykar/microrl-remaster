@@ -5,6 +5,9 @@
 
 1.  The `../src` folder has been reorganized to make it easier to use the library in various SDKs, to which library is added
 2.  The `../src/include/microrl/microrl_user_config.h` file has been renamed to `microrl_user_config_template.h` for to avoid conflicts with used `microrl_user_config.h` file at project
+3.  Added optional hooks called before and after command execution callback
+    - Config `MICRORL_CFG_EXECUTE_STATUS_LOGGING` has been removed. Its functionality has been moved to `post_exec_hook()` in the stm32 example for command hooks functionality demonstration.
+    - Added config `MICRORL_CFG_USE_COMMAND_HOOKS`, which enables using of `MICRORL_PRE_COMMAND_HOOK(mrl, argc, argv)` and `MICRORL_POST_COMMAND_HOOK(mrl, res, argc, argv)` hooks in microrl private code
 
 
 

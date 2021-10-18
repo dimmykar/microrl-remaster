@@ -166,13 +166,6 @@ extern "C" {
 #endif
 
 /**
- * \brief           Enable it to output command exiting status, if it is not equal 0
- */
-#ifndef MICRORL_CFG_EXECUTE_STATUS_LOGGING
-#define MICRORL_CFG_EXECUTE_STATUS_LOGGING    0
-#endif
-
-/**
  * \brief           Enable it and add an 'interrupt signal' callback to invoke it when the user presses Ctrl+C
  */
 #ifndef MICRORL_CFG_USE_CTRL_C
@@ -196,6 +189,36 @@ extern "C" {
  */
 #ifndef MICRORL_CFG_END_LINE
 #define MICRORL_CFG_END_LINE                  "\r\n"
+#endif
+
+/**
+ * \brief           Enable it to use user-defined pre- and post- command execute callbacks (hooks)
+ */
+#ifndef MICRORL_CFG_USE_COMMAND_HOOKS
+#define MICRORL_CFG_USE_COMMAND_HOOKS         0
+#endif
+
+/**
+ * \brief           Optional user implemented function called before command execution callback
+ *                      Not called if \ref MICRORL_CFG_USE_COMMAND_HOOKS is set to 0
+ * \param[in]       mrl: Pointer to microRL working instance
+ * \param[in]       argc: Number of arguments in command line
+ * \param[in]       argv: Pointer to argument list
+ */
+#ifndef MICRORL_PRE_COMMAND_HOOK
+#define MICRORL_PRE_COMMAND_HOOK(mrl, argc, argv)
+#endif
+
+/**
+ * \brief           Optional user implemented function called after command execution callback
+ *                      Not called if \ref MICRORL_CFG_USE_COMMAND_HOOKS is set to 0
+ * \param[in]       mrl: Pointer to microRL working instance
+ * \param[in]       res: Return value of the command execution callback
+ * \param[in]       argc: Number of arguments in command line
+ * \param[in]       argv: Pointer to argument list
+ */
+#ifndef MICRORL_POST_COMMAND_HOOK
+#define MICRORL_POST_COMMAND_HOOK(mrl, res, argc, argv)
 #endif
 
 /**

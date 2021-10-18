@@ -47,10 +47,16 @@ extern "C" {
 #define MICRORL_CFG_USE_ESC_SEQ               1
 #define MICRORL_CFG_USE_LIBC_STDIO            0
 #define MICRORL_CFG_USE_CARRIAGE_RETURN       1
-#define MICRORL_CFG_EXECUTE_STATUS_LOGGING    0
 #define MICRORL_CFG_USE_CTRL_C                1
 #define MICRORL_CFG_PROMPT_ON_INIT            1
 #define MICRORL_CFG_END_LINE                  "\r\n"
+
+#define MICRORL_CFG_USE_COMMAND_HOOKS         1
+#define MICRORL_PRE_COMMAND_HOOK(mrl, argc, argv)             /* Igrnore before command execution hook */
+#define MICRORL_POST_COMMAND_HOOK(mrl, res, argc, argv)       do {                                                                      \
+                                                                  extern void post_exec_hook(microrl_t*, int, int, const char* const *);\
+                                                                  post_exec_hook((mrl), (res), (argc), (argv));                         \
+                                                              } while (0)
 
 #ifdef __cplusplus
 }
