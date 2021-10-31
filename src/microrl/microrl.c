@@ -197,7 +197,7 @@ static microrlr_t prv_cmdline_buf_split(microrl_t* mrl, const char** tkn_arr, ui
  * \return          \ref microrlOK on success, member of \ref microrlr_t enumeration otherwise
  */
 static microrlr_t prv_cmdline_buf_insert_text(microrl_t* mrl, const char* text, size_t len) {
-    if ((mrl->cmdlen + len) < (MICRORL_ARRAYSIZE(mrl->cmdline) - 1)) {
+    if ((mrl->cmdlen + len) <= (MICRORL_ARRAYSIZE(mrl->cmdline) - 1)) {
         if ((mrl->echo == MICRORL_ECHO_ONCE) && (mrl->echo_off_pos == -1)) {
             mrl->echo_off_pos = mrl->cmdlen;
         }

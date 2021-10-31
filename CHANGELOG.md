@@ -10,6 +10,7 @@
     - Added config `MICRORL_CFG_USE_COMMAND_HOOKS`, which enables using of `MICRORL_PRE_COMMAND_HOOK(mrl, argc, argv)` and `MICRORL_POST_COMMAND_HOOK(mrl, res, argc, argv)` hooks in microrl private code
 4.  Added support of multiple compilers for inline keyword
 5.  Fixed incorrect behavior when displaying autocomplete options
+6.  Fixed incorrect determination of whether the command line buffer is full
 
 
 ## v2.1.1
