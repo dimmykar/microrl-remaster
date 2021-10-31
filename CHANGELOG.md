@@ -3,6 +3,10 @@
 
 ## Develop
 
+
+
+## v2.2.0
+
 1.  The `../src` folder has been reorganized to make it easier to use the library in various SDKs, to which library is added
 2.  The `../src/include/microrl/microrl_user_config.h` file has been renamed to `microrl_user_config_template.h` for to avoid conflicts with used `microrl_user_config.h` file at project
 3.  Added optional hooks called before and after command execution callback
