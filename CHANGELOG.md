@@ -9,6 +9,7 @@
     - Config `MICRORL_CFG_EXECUTE_STATUS_LOGGING` has been removed. Its functionality has been moved to `post_exec_hook()` in the stm32 example for command hooks functionality demonstration.
     - Added config `MICRORL_CFG_USE_COMMAND_HOOKS`, which enables using of `MICRORL_PRE_COMMAND_HOOK(mrl, argc, argv)` and `MICRORL_POST_COMMAND_HOOK(mrl, res, argc, argv)` hooks in microrl private code
 4.  Added support of multiple compilers for inline keyword
+5.  Fixed incorrect behavior when displaying autocomplete options
 
 
 ## v2.1.1

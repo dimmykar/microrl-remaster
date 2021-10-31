@@ -695,7 +695,7 @@ static microrlr_t prv_microrl_complite_get_input(microrl_t* mrl) {
         return microrlERRCPLT;
     }
 
-    if (mrl->cmdline[mrl->cursor - 1] == ' ') {
+    if (mrl->cmdline[mrl->cursor - 1] == '\0') {
         tkn_arr[tkn_count++] = "";
     }
     compl_token = mrl->get_completion_fn(mrl, tkn_count, tkn_arr);
@@ -722,11 +722,15 @@ static microrlr_t prv_microrl_complite_get_input(microrl_t* mrl) {
         if (len != 0) {
             prv_cmdline_buf_insert_text(mrl, compl_token[0] + strlen(tkn_arr[tkn_count - 1]),
                                         len - strlen(tkn_arr[tkn_count - 1]));
-            if (compl_token[1] == NULL) {
-                prv_cmdline_buf_insert_text(mrl, " ", 1);
-            }
+        }
 
-            /* Restore whitespaces replaced with '0' when command line buffer was split */
+        /* Insert end space if completion is performed */
+        if (compl_token[1] == NULL) {
+            prv_cmdline_buf_insert_text(mrl, " ", 1);
+        }
+
+        /* Restore whitespaces replaced with '0' when command line buffer was split */
+        if (tkn_count != 0) {
             for (size_t i = 0; i < tkn_count - 1; ++i) {
                 memset((void*)tkn_arr[i] + strlen(tkn_arr[i]), ' ', 1);
             }
@@ -871,7 +875,7 @@ microrlr_t microrl_processing_input(microrl_t* mrl, const void* in_data, size_t 
 
     char* in = (char*)in_data;
 
-    while (len--) {
+    while (len-- != 0) {
         char ch = *in++;
 
 #if MICRORL_CFG_USE_ESC_SEQ
