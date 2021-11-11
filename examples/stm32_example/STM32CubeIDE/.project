@@ -63,7 +63,7 @@
 		<link>
 			<name>microrl/microrl_user_config.h</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/src/microrl_user_config.h</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/microrl_user_config.h</locationURI>
 		</link>
 		<link>
 			<name>st/stm32_assert.c</name>

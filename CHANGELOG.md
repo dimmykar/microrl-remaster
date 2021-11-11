@@ -3,6 +3,10 @@
 
 ## Develop
 
+1.  Build of Unix and AVR demo have been fixed
+    - Added TAB separators in targets of Makefiles replaced with spaces before
+    - `microrl_user_config.h` from STM32 example replaced to `examples` folder. Now it is common for all examples, but `post_exec_hook()` demonstration is implemented only in STM32 example
+    - Other fixes for successful build of Unix and AVR demos
 
 
 ## v2.2.0

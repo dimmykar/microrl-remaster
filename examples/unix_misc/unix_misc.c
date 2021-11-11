@@ -143,7 +143,7 @@ int execute(microrl_t* mrl, int argc, const char* const *argv) {
     while (i < argc) {
         if (strcmp (argv[i], _CMD_HELP) == 0) {
             print(mrl, "microrl library based shell v 1.0\n\r");
-            print_help();        /* Print help */
+            print_help(mrl);        /* Print help */
         } else if (strcmp (argv[i], _CMD_NAME) == 0) {
             if ((++i) < argc) { /* If value preset */
                 if (strlen(argv[i]) < _NAME_LEN) {
@@ -249,3 +249,16 @@ void sigint(microrl_t* mrl) {
     print(mrl, "^C is caught!\n\r");
 }
 #endif /* MICRORL_CFG_USE_CTRL_C || __DOXYGEN__ */
+
+#if MICRORL_CFG_USE_COMMAND_HOOKS
+/**
+ * \brief           Hook called after command execution callback
+ * \param[in,out]   mrl: \ref microrl_t working instance
+ * \param[in]       res: Return value of the command execution callback
+ * \param[in]       argc: Number of arguments in command line
+ * \param[in]       argv: Pointer to argument list
+ */
+void post_exec_hook(microrl_t* mrl, int res, int argc, const char* const *argv) {
+
+}
+#endif /* MICRORL_CFG_USE_COMMAND_HOOKS */

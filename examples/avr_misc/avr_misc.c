@@ -89,7 +89,7 @@ int print(microrl_t* mrl, const char* str) {
  * \return          Input character
  */
 char get_char(void) {
-    while (!(UCSRA & (1<<RXC)));
+    while (!(UCSRA & (1 << RXC)));
     return UDR;
 }
 
@@ -264,3 +264,16 @@ void sigint(microrl_t* mrl) {
     print(mrl, "^C is caught!"_ENDLINE_SEQ);
 }
 #endif /* MICRORL_CFG_USE_CTRL_C || __DOXYGEN__ */
+
+#if MICRORL_CFG_USE_COMMAND_HOOKS
+/**
+ * \brief           Hook called after command execution callback
+ * \param[in,out]   mrl: \ref microrl_t working instance
+ * \param[in]       res: Return value of the command execution callback
+ * \param[in]       argc: Number of arguments in command line
+ * \param[in]       argv: Pointer to argument list
+ */
+void post_exec_hook(microrl_t* mrl, int res, int argc, const char* const *argv) {
+
+}
+#endif /* MICRORL_CFG_USE_COMMAND_HOOKS */
