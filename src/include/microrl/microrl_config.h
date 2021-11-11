@@ -23,7 +23,7 @@
  *
  * Authors:         Eugene SAMOYLOV aka Helius <ghelius@gmail.com>,
  *                  Dmitry KARASEV <karasevsdmitry@yandex.ru>
- * Version:         2.2.0
+ * Version:         2.2.1-dev
  */
 
 #ifndef MICRORL_HDR_DEFAULT_CONFIG_H

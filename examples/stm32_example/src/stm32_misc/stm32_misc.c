@@ -21,7 +21,7 @@
  * This file is part of MicroRL - Micro Read Line library for small and embedded devices.
  *
  * Author:          Dmitry KARASEV <karasevsdmitry@yandex.ru>
- * Version:         2.2.0
+ * Version:         2.2.1-dev
  */
 
 #include <string.h>
