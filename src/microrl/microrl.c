@@ -23,7 +23,7 @@
  *
  * Authors:         Eugene SAMOYLOV aka Helius <ghelius@gmail.com>,
  *                  Dmitry KARASEV <karasevsdmitry@yandex.ru>
- * Version:         2.2.1-dev
+ * Version:         2.2.1
  */
 
 #include <stdint.h>
@@ -393,7 +393,7 @@ static void prv_terminal_print_line(microrl_t* mrl, int32_t pos, uint8_t reset) 
  * \param[in]       prbuf: Pointer to \ref microrl_hist_rbuf_t structure
  * \param[in,out]   index: Pointer to the current record
  */
-__INLINE__ static void prv_hist_next_record(microrl_hist_rbuf_t* prbuf, size_t* index) {
+static __INLINE__ void prv_hist_next_record(microrl_hist_rbuf_t* prbuf, size_t* index) {
     while (prbuf->ring_buf[*index] != '\0') {
         ++(*index);
         if (*index >= MICRORL_ARRAYSIZE(prbuf->ring_buf)) {
