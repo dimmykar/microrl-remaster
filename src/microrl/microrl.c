@@ -175,6 +175,9 @@ static microrlr_t prv_cmdline_buf_split(microrl_t* mrl, const char** tkn_arr, ui
 #endif /* MICRORL_CFG_USE_QUOTING */
                 ++str;
             }
+            if (*str == '\0') {
+                break;
+            }
             *str = '\0';
             ++str;
 #if MICRORL_CFG_USE_QUOTING
