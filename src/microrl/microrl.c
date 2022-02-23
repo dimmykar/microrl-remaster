@@ -201,7 +201,7 @@ static microrlr_t prv_cmdline_buf_split(microrl_t* mrl, const char** tkn_arr, ui
  */
 static microrlr_t prv_cmdline_buf_insert_text(microrl_t* mrl, const char* text, size_t len) {
     if ((mrl->cmdlen + len) <= (MICRORL_ARRAYSIZE(mrl->cmdline) - 1)) {
-        if ((mrl->echo == MICRORL_ECHO_ONCE) && (mrl->echo_off_pos == -1)) {
+        if ((mrl->echo != MICRORL_ECHO_ON) && (mrl->echo_off_pos == -1)) {
             mrl->echo_off_pos = mrl->cmdlen;
         }
         memmove(mrl->cmdline + mrl->cursor + len,
@@ -1014,7 +1014,7 @@ microrlr_t microrl_processing_input(microrl_t* mrl, const void* in_data, size_t 
                     if (prv_cmdline_buf_insert_text(mrl, &ch, 1) == microrlOK) {
                         if (mrl->cursor == mrl->cmdlen) {
                             char nch[] = {0, 0};
-                            if ((mrl->cursor >= mrl->echo_off_pos) && (mrl->echo == MICRORL_ECHO_ONCE)) {
+                            if ((mrl->cursor >= mrl->echo_off_pos) && (mrl->echo != MICRORL_ECHO_ON)) {
                                 nch[0] = '*';
                             } else {
                                 nch[0] = ch;
