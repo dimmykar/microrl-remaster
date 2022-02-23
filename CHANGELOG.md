@@ -6,6 +6,12 @@
 
 
 
+## v2.2.2
+
+1.  Fix possible command line buffer overflow
+2.  Fix echo off feature: previously this feature only worked with `MICRORL_ECHO_ONCE`, now it also works with `MICRORL_ECHO_OFF`
+
+
 ## v2.2.1
 
 1.  Build of Unix and AVR demo have been fixed
