@@ -30,6 +30,7 @@
 #define MICRORL_HDR_H
 
 #include <stdint.h>
+#include <stddef.h>
 #include "microrl_config.h"
 
 #ifdef __cplusplus
