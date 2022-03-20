@@ -140,7 +140,7 @@ static microrlr_t prv_cmdline_buf_split(microrl_t* mrl, const char** tkn_arr, ui
             tkn_arr[num++] = str;               /* Set start of argument after quotes */
 
             while (*str != '\0') {              /* Process until end of quote */
-                if (!((str - mrl->cmdline) < limit)) {
+                if (!((size_t)(str - mrl->cmdline) < limit)) {
                     tkn_arr[--num] = NULL;
                     *tkn_count = num;
                     return microrlOK;
@@ -163,7 +163,7 @@ static microrlr_t prv_cmdline_buf_split(microrl_t* mrl, const char** tkn_arr, ui
 #endif /* MICRORL_CFG_USE_QUOTING */
             tkn_arr[num++] = str;               /* Set start of argument directly on character */
             while ((*str != ' ' && *str != '\0')) {
-                if (!((str - mrl->cmdline) < limit)) {
+                if (!((size_t)(str - mrl->cmdline) < limit)) {
                     tkn_arr[--num] = NULL;
                     *tkn_count = num;
                     return microrlOK;
@@ -368,15 +368,15 @@ static void prv_terminal_print_line(microrl_t* mrl, int32_t pos, uint8_t reset) 
     }
 
     for (size_t i = pos; i < mrl->cmdlen; ++i) {
-        *j++ = ((i >= mrl->echo_off_pos) && (mrl->echo != MICRORL_ECHO_ON)) ? '*' : mrl->cmdline[i];
-        if ((j - str) == strlen(str)) {
+        *j++ = (((int32_t)i >= mrl->echo_off_pos) && (mrl->echo != MICRORL_ECHO_ON)) ? '*' : mrl->cmdline[i];
+        if ((size_t)(j - str) == strlen(str)) {
             *j = '\0';
             mrl->out_fn(mrl, str);
             j = str;
         }
     }
 
-    if ((j - str + 3 + 6 + 1) > MICRORL_ARRAYSIZE(str)) {
+    if ((size_t)(j - str + 3 + 6 + 1) > MICRORL_ARRAYSIZE(str)) {
         *j = '\0';
         mrl->out_fn(mrl, str);
         j = str;
@@ -734,8 +734,8 @@ static microrlr_t prv_microrl_complite_get_input(microrl_t* mrl) {
 
         /* Restore whitespaces replaced with '0' when command line buffer was split */
         if (tkn_count != 0) {
-            for (size_t i = 0; i < tkn_count - 1; ++i) {
-                memset((void*)tkn_arr[i] + strlen(tkn_arr[i]), ' ', 1);
+            for (size_t i = 0; i < (size_t)(tkn_count - 1); ++i) {
+                memset((char*)tkn_arr[i] + strlen(tkn_arr[i]), ' ', 1);
             }
         }
 
@@ -1014,7 +1014,7 @@ microrlr_t microrl_processing_input(microrl_t* mrl, const void* in_data, size_t 
                     if (prv_cmdline_buf_insert_text(mrl, &ch, 1) == microrlOK) {
                         if (mrl->cursor == mrl->cmdlen) {
                             char nch[] = {0, 0};
-                            if ((mrl->cursor >= mrl->echo_off_pos) && (mrl->echo != MICRORL_ECHO_ON)) {
+                            if (((int32_t)mrl->cursor >= mrl->echo_off_pos) && (mrl->echo != MICRORL_ECHO_ON)) {
                                 nch[0] = '*';
                             } else {
                                 nch[0] = ch;
