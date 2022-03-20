@@ -16,6 +16,8 @@ ESP8266 platform specific implementation routines.
 
 //*****************************************************************************
 void print(microrl_t* mrl, const char* str) {
+    MICRORL_UNUSED(mrl);
+
     Serial.print(str);
 }
 

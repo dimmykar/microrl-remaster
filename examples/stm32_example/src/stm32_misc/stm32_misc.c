@@ -437,6 +437,9 @@ void sigint(microrl_t* mrl) {
  * \param[in]       argv: Pointer to argument list
  */
 void post_exec_hook(microrl_t* mrl, int res, int argc, const char* const *argv) {
+    MICRORL_UNUSED(argc);
+    MICRORL_UNUSED(argv);
+
     if (res != 0) {
         char str[11] = {0};
 #if MICRORL_CFG_USE_LIBC_STDIO

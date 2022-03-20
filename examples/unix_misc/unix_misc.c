@@ -70,7 +70,7 @@ int val;
  */
 void init(void) {
 
-};
+}
 
 /**
  * \brief           Print to IO stream callback for MicroRL library
@@ -80,6 +80,8 @@ void init(void) {
  *                      not counting the terminating null character.
  */
 int print(microrl_t* mrl, const char* str) {
+    MICRORL_UNUSED(mrl);
+    
     return fprintf(stdout, "%s", str);
 }
 
@@ -259,6 +261,9 @@ void sigint(microrl_t* mrl) {
  * \param[in]       argv: Pointer to argument list
  */
 void post_exec_hook(microrl_t* mrl, int res, int argc, const char* const *argv) {
-
+    MICRORL_UNUSED(mrl);
+    MICRORL_UNUSED(res);
+    MICRORL_UNUSED(argc);
+    MICRORL_UNUSED(argv);
 }
 #endif /* MICRORL_CFG_USE_COMMAND_HOOKS */
