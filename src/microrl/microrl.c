@@ -414,6 +414,15 @@ static void prv_hist_erase_older(microrl_hist_rbuf_t* prbuf) {
     size_t new_pos = prbuf->head;
     prv_hist_next_record(prbuf, &new_pos);
     prbuf->head = new_pos;
+
+    /*
+     * If after record erasing the head has moved further than the tail,
+     * then the history is empty, so it is needed to reset the tail
+     */
+    if (prbuf->head == prbuf->tail + 1) {
+        prbuf->tail = prbuf->head;
+        prbuf->ring_buf[prbuf->tail] = '\0';
+    }
 }
 
 /**
