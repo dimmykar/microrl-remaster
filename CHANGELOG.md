@@ -5,6 +5,13 @@
 
 
 
+## v2.2.3
+
+1.  Add missing including of `stddef.h` for `size_t` type to prevent compiling errors [#1](https://github.com/dimmykar/microrl-remaster/issues/1)
+2.  Fix wrong signed-unsigned types comparsions and other possible warnings while compiling [#1](https://github.com/dimmykar/microrl-remaster/issues/1)
+3.  Fix record erasing from history in case of all existing records erased
+4.  Fix restoring of empty line in case of restoring the first previous record and pressing `DOWN` key to back to empty line
+
 
 ## v2.2.2
 
