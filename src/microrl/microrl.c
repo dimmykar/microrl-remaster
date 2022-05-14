@@ -495,7 +495,6 @@ static size_t prv_hist_restore_line(microrl_t* mrl, microrl_hist_rbuf_t* prbuf, 
         ++cnt;
     }
 
-
     size_t ind = prbuf->head;
     size_t j = 0;
     if (dir == MICRORL_HIST_DIR_UP) {           /* Set navigation counter depending on the direction */
@@ -508,15 +507,16 @@ static size_t prv_hist_restore_line(microrl_t* mrl, microrl_hist_rbuf_t* prbuf, 
         }
     } else {
         if (prbuf->count > 0) {
-            --prbuf->count;
+            if (--prbuf->count == 0) {
+                return 0;                       /* Empty line */
+            }
         } else {
             return 0;                           /* Empty line */
         }
     }
 
-    while ((cnt - j) != prbuf->count) {         /* Find record for 'prbuf->count' counter */
+    while ((cnt - j++) != prbuf->count) {       /* Find record for 'prbuf->count' counter */
         prv_hist_next_record(prbuf, &ind);
-        ++j;
     }
 
     size_t rec_len = 0;
