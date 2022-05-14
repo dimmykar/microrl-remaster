@@ -164,8 +164,8 @@ void print_help(microrl_t* mrl) {
     print(mrl, _ENDLINE_SEQ);
 
     if (!logged_in) {
-      print(mrl, "\tlogin YOUR_LOGIN      - 'admin' in this example"_ENDLINE_SEQ);
-      print(mrl, "If login is correct, you will be asked to enter password."_ENDLINE_SEQ);
+        print(mrl, "\tlogin YOUR_LOGIN      - 'admin' in this example"_ENDLINE_SEQ);
+        print(mrl, "If login is correct, you will be asked to enter password."_ENDLINE_SEQ);
     } else {
         print(mrl, "Use TAB key for completion"_ENDLINE_SEQ"List of commands:"_ENDLINE_SEQ);
         print(mrl, "\tclear               - clear screen"_ENDLINE_SEQ);
