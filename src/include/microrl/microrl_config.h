@@ -122,6 +122,14 @@ extern "C" {
 #endif
 
 /**
+ * \brief           Set the character, which will mask the secret input when echo is off
+ *                  You can set it to '\0' to disable output of secret data to the terminal
+ */
+#ifndef MICRORL_CFG_ECHO_OFF_MASK
+#define MICRORL_CFG_ECHO_OFF_MASK             '*'
+#endif
+
+/**
  * \brief           Enable it, if you want to use history. It works like bash history, and
  *                  sets stored value to command line, if 'UP' or 'DOWN' key is pressed.
  *                  Using of history increases memory consumption and depends on the

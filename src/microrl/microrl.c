@@ -374,7 +374,7 @@ static void prv_terminal_print_line(microrl_t* mrl, int32_t pos, uint8_t reset) 
 
 #if MICRORL_CFG_USE_ECHO_OFF
         if (((int32_t)i >= mrl->echo_off_pos) && (mrl->echo != MICRORL_ECHO_ON)) {
-            *j = '*';
+            *j = MICRORL_CFG_ECHO_OFF_MASK;
         }
 #endif /* MICRORL_CFG_USE_ECHO_OFF */
 
@@ -1075,7 +1075,7 @@ microrlr_t microrl_processing_input(microrl_t* mrl, const void* in_data, size_t 
                             nch[0] = ch;
 #if MICRORL_CFG_USE_ECHO_OFF
                             if (((int32_t)mrl->cursor >= mrl->echo_off_pos) && (mrl->echo != MICRORL_ECHO_ON)) {
-                                nch[0] = '*';
+                                nch[0] = MICRORL_CFG_ECHO_OFF_MASK;
                             }
 #endif /* MICRORL_CFG_USE_ECHO_OFF */
                             mrl->out_fn(mrl, nch);
