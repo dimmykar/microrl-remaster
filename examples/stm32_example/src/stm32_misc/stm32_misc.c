@@ -38,7 +38,7 @@
 #define UART_RX_Pin                 LL_GPIO_PIN_11
 #define UART_RX_GPIO_Port           GPIOC
 
-#define _STM32_DEMO_VER             "1.2"
+#define _STM32_DEMO_VER             "1.3"
 
 #define _ENDLINE_SEQ                "\r\n"
 
@@ -53,8 +53,10 @@
 #define _NUM_OF_CMD                 3
 #define _NUM_OF_SETCLEAR_SCMD       2
 
+#if MICRORL_CFG_USE_ECHO_OFF
 #define SESSION_ADMIN_LOGIN        "admin"
 #define SESSION_ADMIN_PASSW        "1234"
+#endif /* MICRORL_CFG_USE_ECHO_OFF */
 
 /* Available  commands */
 char* keyword[] = {_CMD_HELP, _CMD_CLEAR, _CMD_SERNUM};
@@ -68,9 +70,11 @@ char* compl_word[_NUM_OF_CMD + 1];
 /* Variable changeable with commands */
 uint32_t device_sn = 0;
 
+#if MICRORL_CFG_USE_ECHO_OFF
 /* Session status flags */
 uint8_t  logged_in = 0;
 uint8_t  passw_in = 0;
+#endif /* MICRORL_CFG_USE_ECHO_OFF */
 
 /**
  * \brief           Init STM32F4 platform
@@ -163,16 +167,22 @@ void print_help(microrl_t* mrl) {
     print(mrl, _STM32_DEMO_VER);
     print(mrl, _ENDLINE_SEQ);
 
+#if MICRORL_CFG_USE_ECHO_OFF
     if (!logged_in) {
         print(mrl, "\tlogin YOUR_LOGIN      - 'admin' in this example"_ENDLINE_SEQ);
         print(mrl, "If login is correct, you will be asked to enter password."_ENDLINE_SEQ);
-    } else {
-        print(mrl, "Use TAB key for completion"_ENDLINE_SEQ"List of commands:"_ENDLINE_SEQ);
-        print(mrl, "\tclear               - clear screen"_ENDLINE_SEQ);
-        print(mrl, "\tsernum ?            - read serial number value"_ENDLINE_SEQ);
-        print(mrl, "\tsernum VALUE        - set serial number value"_ENDLINE_SEQ);
-        print(mrl, "\tsernum save         - save serial number value to flash"_ENDLINE_SEQ);
     }
+#endif /* MICRORL_CFG_USE_ECHO_OFF */
+
+#if MICRORL_CFG_USE_COMPLETE
+    print(mrl, "Use TAB key for completion"_ENDLINE_SEQ);
+#endif /* MICRORL_CFG_USE_COMPLETE */
+
+    print(mrl, "List of commands:"_ENDLINE_SEQ);
+    print(mrl, "\tclear               - clear screen"_ENDLINE_SEQ);
+    print(mrl, "\tsernum ?            - read serial number value"_ENDLINE_SEQ);
+    print(mrl, "\tsernum VALUE        - set serial number value"_ENDLINE_SEQ);
+    print(mrl, "\tsernum save         - save serial number value to flash"_ENDLINE_SEQ);
 }
 
 /**
@@ -283,7 +293,11 @@ void save_sernum(microrl_t* mrl) {
  * \param[in]       argv: pointer array to token string
  * \return          '0' on success, '1' otherwise
  */
+#if MICRORL_CFG_USE_ECHO_OFF
 int execute_main(microrl_t* mrl, int argc, const char* const *argv) {
+#else
+int execute(microrl_t* mrl, int argc, const char* const *argv) {
+#endif /* MICRORL_CFG_USE_ECHO_OFF || __DOXYGEN__ */
     size_t i = 0;
 
     /* Just iterate through argv word and compare it with your commands */
@@ -317,6 +331,7 @@ int execute_main(microrl_t* mrl, int argc, const char* const *argv) {
     return 0;
 }
 
+#if MICRORL_CFG_USE_ECHO_OFF || __DOXYGEN__
 /**
  * \brief           Log in execute callback for MicroRL library
  *
@@ -370,6 +385,7 @@ int execute(microrl_t* mrl, int argc, const char* const *argv) {
 
     return 0;
 }
+#endif /* MICRORL_CFG_USE_ECHO_OFF || __DOXYGEN__ */
 
 #if MICRORL_CFG_USE_COMPLETE || __DOXYGEN__
 /**
