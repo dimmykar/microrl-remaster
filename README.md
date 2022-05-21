@@ -40,9 +40,9 @@ Microrl library is designed to help implement command line interface in small an
   - Quoting (optional)
     * Use double quotes around a command argument that needs to include space characters
 
-  - Echo control
-    * Use `microrl_set_echo()` function to turn on or turn off echo.
-    * Could be used to print `*` insted of real characters.
+  - Echo control (optional)
+    * Use `microrl_set_echo()` function to turn on or turn off echo
+    * Could be used to print `*` or other specified character insted of real characters to mask secret input like passwords
 
 
 ## Source code organization
