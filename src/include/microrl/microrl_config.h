@@ -108,6 +108,20 @@ extern "C" {
 #endif
 
 /**
+ * \brief           Enable it, if you want to use "echo off" feature.
+ *                  "Echo off" is used for typing the secret input data, like passwords.
+ *                  When the feature is enabled, there are 2 type of echo off: ONCE and OFF.
+ *                  Use \ref MICRORL_ECHO_ONCE to disable echo for password input, echo mode
+ *                  will enabled after user press 'Enter'.
+ *                  Use \ref MICRORL_ECHO_ON or \ref MICRORL_ECHO_OFF to turn on or off the
+ *                  echo manually.
+ *                  At library initialization echo is ON
+ */
+#ifndef MICRORL_CFG_USE_ECHO_OFF
+#define MICRORL_CFG_USE_ECHO_OFF              0
+#endif
+
+/**
  * \brief           Enable it, if you want to use history. It works like bash history, and
  *                  sets stored value to command line, if 'UP' or 'DOWN' key is pressed.
  *                  Using of history increases memory consumption and depends on the

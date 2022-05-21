@@ -77,6 +77,7 @@ typedef enum {
     MICRORL_ESC_END                             /*!< Encountered 'END' code after ESQ code */
 } microrl_esq_code_t;
 
+#if MICRORL_CFG_USE_ECHO_OFF || __DOXYGEN__
 /**
  * \brief           List of possible echo modes
  */
@@ -85,6 +86,7 @@ typedef enum {
     MICRORL_ECHO_ON,                            /*!< Echo is always enabled */
     MICRORL_ECHO_OFF                            /*!< Echo is always disabled */
 } microrl_echo_t;
+#endif /* MICRORL_CFG_USE_ECHO_OFF || __DOXYGEN__ */
 
 /* Forward declarations */
 struct microrl;
@@ -170,8 +172,10 @@ typedef struct microrl {
     microrl_hist_rbuf_t ring_hist;              /*!< Ring history object */
 #endif /* MICRORL_CFG_USE_HISTORY || __DOXYGEN__ */
 
+#if MICRORL_CFG_USE_ECHO_OFF || __DOXYGEN__
     microrl_echo_t echo;                        /*!< Echo mode */
     int32_t echo_off_pos;                       /*!< Start position to print '*' echo off chars */
+#endif /* MICRORL_CFG_USE_ECHO_OFF || __DOXYGEN__ */
 
     void* userdata;                             /*!< Generic user data storage */
 } microrl_t;
@@ -187,7 +191,9 @@ microrlr_t  microrl_set_sigint_callback(microrl_t* mrl, microrl_sigint_fn sigint
 #endif /* MICRORL_CFG_USE_CTRL_C */
 
 microrlr_t  microrl_set_prompt(microrl_t* mrl, char* prompt);
+#if MICRORL_CFG_USE_ECHO_OFF || __DOXYGEN__
 microrlr_t  microrl_set_echo(microrl_t* mrl, microrl_echo_t echo);
+#endif /* #if MICRORL_CFG_USE_ECHO_OFF */
 
 microrlr_t  microrl_processing_input(microrl_t* mrl, const void* in_data, size_t len);
 

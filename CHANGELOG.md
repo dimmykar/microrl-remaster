@@ -3,6 +3,7 @@
 
 ## Develop
 
+1.  Add config `MICRORL_CFG_USE_ECHO_OFF` for enable/disable "echo off" feature in library. By default the feature is disabled
 
 
 ## v2.2.3

@@ -201,9 +201,11 @@ static microrlr_t prv_cmdline_buf_split(microrl_t* mrl, const char** tkn_arr, ui
  */
 static microrlr_t prv_cmdline_buf_insert_text(microrl_t* mrl, const char* text, size_t len) {
     if ((mrl->cmdlen + len) <= (MICRORL_ARRAYSIZE(mrl->cmdline) - 1)) {
+#if MICRORL_CFG_USE_ECHO_OFF
         if ((mrl->echo != MICRORL_ECHO_ON) && (mrl->echo_off_pos == -1)) {
             mrl->echo_off_pos = mrl->cmdlen;
         }
+#endif /* #if MICRORL_CFG_USE_ECHO_OFF */
         memmove(mrl->cmdline + mrl->cursor + len,
                 mrl->cmdline + mrl->cursor,
                 mrl->cmdlen - mrl->cursor);
@@ -368,7 +370,16 @@ static void prv_terminal_print_line(microrl_t* mrl, int32_t pos, uint8_t reset) 
     }
 
     for (size_t i = pos; i < mrl->cmdlen; ++i) {
-        *j++ = (((int32_t)i >= mrl->echo_off_pos) && (mrl->echo != MICRORL_ECHO_ON)) ? '*' : mrl->cmdline[i];
+        *j = mrl->cmdline[i];
+
+#if MICRORL_CFG_USE_ECHO_OFF
+        if (((int32_t)i >= mrl->echo_off_pos) && (mrl->echo != MICRORL_ECHO_ON)) {
+            *j = '*';
+        }
+#endif /* MICRORL_CFG_USE_ECHO_OFF */
+
+        ++j;
+
         if ((size_t)(j - str) == strlen(str)) {
             *j = '\0';
             mrl->out_fn(mrl, str);
@@ -569,17 +580,31 @@ static uint8_t prv_escape_process(microrl_t* mrl, char ch) {
     } else if (mrl->esc_code == MICRORL_ESC_BRACKET) {
         if (ch == 'A') {
 #if MICRORL_CFG_USE_HISTORY
-            if (mrl->echo == MICRORL_ECHO_ON) {
-                prv_hist_search(mrl, MICRORL_HIST_DIR_UP);
+
+#if MICRORL_CFG_USE_ECHO_OFF
+            if (mrl->echo != MICRORL_ECHO_ON) {
+                return 1;
             }
+#endif /* MICRORL_CFG_USE_ECHO_OFF */
+
+            prv_hist_search(mrl, MICRORL_HIST_DIR_UP);
+
 #endif /* MICRORL_CFG_USE_HISTORY */
+
             return 1;
         } else if (ch == 'B') {
 #if MICRORL_CFG_USE_HISTORY
-            if (mrl->echo == MICRORL_ECHO_ON) {
-                prv_hist_search(mrl, MICRORL_HIST_DIR_DOWN);
+
+#if MICRORL_CFG_USE_ECHO_OFF
+            if (mrl->echo != MICRORL_ECHO_ON) {
+                return 1;
             }
+#endif /* MICRORL_CFG_USE_ECHO_OFF */
+
+            prv_hist_search(mrl, MICRORL_HIST_DIR_DOWN);
+
 #endif /* MICRORL_CFG_USE_HISTORY */
+
             return 1;
         } else if (ch == 'C') {
             if (mrl->cursor < mrl->cmdlen) {
@@ -629,14 +654,23 @@ static microrlr_t prv_handle_newline(microrl_t* mrl) {
     prv_terminal_newline(mrl);
 
 #if MICRORL_CFG_USE_HISTORY
-    if ((mrl->cmdlen > 0) && (mrl->echo == MICRORL_ECHO_ON)) {
-        prv_hist_save_line(&mrl->ring_hist, mrl->cmdline, mrl->cmdlen);
+    if (mrl->cmdlen > 0) {
+#if MICRORL_CFG_USE_ECHO_OFF
+        if (mrl->echo == MICRORL_ECHO_ON) {
+#endif /* MICRORL_CFG_USE_ECHO_OFF */
+            prv_hist_save_line(&mrl->ring_hist, mrl->cmdline, mrl->cmdlen);
+#if MICRORL_CFG_USE_ECHO_OFF
+        }
+#endif /* MICRORL_CFG_USE_ECHO_OFF */
     }
 #endif /* MICRORL_CFG_USE_HISTORY */
+
+#if MICRORL_CFG_USE_ECHO_OFF
     if (mrl->echo == MICRORL_ECHO_ONCE) {
         microrl_set_echo(mrl, MICRORL_ECHO_ON);
         mrl->echo_off_pos = -1;
     }
+#endif /* MICRORL_CFG_USE_ECHO_OFF */
 
     status = prv_cmdline_buf_split(mrl, tkn_arr, &tkn_count, mrl->cmdlen);
     if (status == microrlOK) {
@@ -779,8 +813,10 @@ microrlr_t microrl_init(microrl_t* mrl, microrl_output_fn out_fn, microrl_exec_f
     prv_terminal_print_prompt(mrl);
 #endif /* MICRORL_CFG_PROMPT_ON_INIT */
 
+#if MICRORL_CFG_USE_ECHO_OFF
     mrl->echo = MICRORL_ECHO_ON;
     mrl->echo_off_pos = -1;
+#endif /* MICRORL_CFG_USE_ECHO_OFF */
 
     return microrlOK;
 }
@@ -853,6 +889,7 @@ microrlr_t  microrl_set_prompt(microrl_t* mrl, char* prompt) {
     return microrlOK;
 }
 
+#if MICRORL_CFG_USE_ECHO_OFF || __DOXYGEN__
 /**
  * \brief           Set echo mode used to mask user input
  *
@@ -872,6 +909,7 @@ microrlr_t microrl_set_echo(microrl_t* mrl, microrl_echo_t echo) {
 
     return microrlOK;
 }
+#endif /* MICRORL_CFG_USE_ECHO_OFF || __DOXYGEN__ */
 
 /**
  * \brief           Processing command line input
@@ -970,18 +1008,29 @@ microrlr_t microrl_processing_input(microrl_t* mrl, const void* in_data, size_t 
                 }
                 case MICRORL_ESQ_ANSI_DLE: { /* ^P */
 #if MICRORL_CFG_USE_HISTORY
-                if (mrl->echo == MICRORL_ECHO_ON) {
-                    prv_hist_search(mrl, MICRORL_HIST_DIR_UP);
+
+#if MICRORL_CFG_USE_ECHO_OFF
+                if (mrl->echo != MICRORL_ECHO_ON) {
+                    break;
                 }
+#endif /* MICRORL_CFG_USE_ECHO_OFF */
+
+                prv_hist_search(mrl, MICRORL_HIST_DIR_UP);
 #endif /* MICRORL_CFG_USE_HISTORY */
+
                     break;
                 }
                 case MICRORL_ESQ_ANSI_SO: { /* ^N */
 #if MICRORL_CFG_USE_HISTORY
-                if (mrl->echo == MICRORL_ECHO_ON) {
-                    prv_hist_search(mrl, MICRORL_HIST_DIR_DOWN);
+#if MICRORL_CFG_USE_ECHO_OFF
+                if (mrl->echo != MICRORL_ECHO_ON) {
+                    break;
                 }
+#endif /* MICRORL_CFG_USE_ECHO_OFF */
+
+                prv_hist_search(mrl, MICRORL_HIST_DIR_DOWN);
 #endif /* MICRORL_CFG_USE_HISTORY */
+
                     break;
                 }
                 case MICRORL_ESQ_ANSI_DEL:  /* Backspace */
@@ -1023,11 +1072,12 @@ microrlr_t microrl_processing_input(microrl_t* mrl, const void* in_data, size_t 
                     if (prv_cmdline_buf_insert_text(mrl, &ch, 1) == microrlOK) {
                         if (mrl->cursor == mrl->cmdlen) {
                             char nch[] = {0, 0};
+                            nch[0] = ch;
+#if MICRORL_CFG_USE_ECHO_OFF
                             if (((int32_t)mrl->cursor >= mrl->echo_off_pos) && (mrl->echo != MICRORL_ECHO_ON)) {
                                 nch[0] = '*';
-                            } else {
-                                nch[0] = ch;
                             }
+#endif /* MICRORL_CFG_USE_ECHO_OFF */
                             mrl->out_fn(mrl, nch);
                         } else {
                             prv_terminal_print_line(mrl, mrl->cursor - 1, 0);
