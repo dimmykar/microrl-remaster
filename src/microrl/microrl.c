@@ -457,48 +457,13 @@ static microrl_hist_status_t prv_hist_is_space_for_new(microrl_hist_rbuf_t* prbu
 }
 
 /**
- * \brief           Put record to ring buffer
- * \param[in,out]   prbuf: Pointer to \ref microrl_hist_rbuf_t structure
- * \param[in]       line: Record to save in history
- * \param[in]       len: Record length
- */
-static void prv_hist_save_line(microrl_hist_rbuf_t* prbuf, char* line, size_t len) {
-    if (len > (MICRORL_ARRAYSIZE(prbuf->ring_buf) - 1)) {
-        return;
-    }
-
-    while (prv_hist_is_space_for_new(prbuf, len) == MICRORL_HIST_FULL) {    /* Freeing up space for saving in the ring buffer */
-        prv_hist_erase_older(prbuf);
-    }
-
-    if (len < (MICRORL_ARRAYSIZE(prbuf->ring_buf) - prbuf->tail - 1)) {     /* Store record */
-        memcpy(prbuf->ring_buf + prbuf->tail + 1, line, len);
-    } else {
-        size_t part_len = MICRORL_ARRAYSIZE(prbuf->ring_buf) - prbuf->tail - 1;
-        memcpy(prbuf->ring_buf + prbuf->tail + 1, line, part_len);
-        memcpy(prbuf->ring_buf, line + part_len, len - part_len);
-    }
-
-    if (prbuf->head == prbuf->tail) {           /* Update position pointer and navigation counter */
-        ++prbuf->head;
-    }
-    prbuf->tail = prbuf->tail + len + 1;
-    if (prbuf->tail >= MICRORL_ARRAYSIZE(prbuf->ring_buf)) {
-        prbuf->tail -= MICRORL_ARRAYSIZE(prbuf->ring_buf);
-    }
-    prbuf->ring_buf[prbuf->tail] = 0;
-    prbuf->count = 0;
-}
-
-/**
  * \brief           Copy saved record to 'line' and return size of record
- * \param[out]      mrl: \ref microrl_t working instance
  * \param[in]       prbuf: Pointer to \ref microrl_hist_rbuf_t structure
  * \param[out]      line: Line to restore from history
  * \param[in]       dir: Record search direction, member of \ref microrl_hist_dir_t
  * \return          Size of restored line. `0` is returned, if history is empty
  */
-static size_t prv_hist_restore_line(microrl_t* mrl, microrl_hist_rbuf_t* prbuf, char* line, microrl_hist_dir_t dir) {
+static size_t prv_hist_restore_line(microrl_hist_rbuf_t* prbuf, char* line, microrl_hist_dir_t dir) {
     size_t cnt = 0;
     size_t i = prbuf->head;
     while (i - 1 != prbuf->tail) {              /* Count history records */
@@ -540,7 +505,7 @@ static size_t prv_hist_restore_line(microrl_t* mrl, microrl_hist_rbuf_t* prbuf, 
         ++rec_len;
     }
 
-    memset(line, 0x00, MICRORL_ARRAYSIZE(mrl->cmdline) - 1);    /* Placing the found record on the command line */
+    memset(line, 0x00, MICRORL_CFG_CMDLINE_LEN);    /* Placing the found record on the command line */
     if ((ind + rec_len) < MICRORL_ARRAYSIZE(prbuf->ring_buf)) {
         memcpy(line, prbuf->ring_buf + ind, rec_len);
     } else {
@@ -558,10 +523,52 @@ static size_t prv_hist_restore_line(microrl_t* mrl, microrl_hist_rbuf_t* prbuf, 
  * \param[in]       dir: Member of \ref microrl_hist_dir_t enumeration
  */
 static void prv_hist_search(microrl_t* mrl, microrl_hist_dir_t dir) {
-    size_t len = prv_hist_restore_line(mrl, &mrl->ring_hist, mrl->cmdline, dir);
+    size_t len = prv_hist_restore_line(&mrl->ring_hist, mrl->cmdline, dir);
     memset(&mrl->cmdline[len], 0x00, MICRORL_ARRAYSIZE(mrl->cmdline) - 1 - len);
     mrl->cursor = mrl->cmdlen = len;
     prv_terminal_print_line(mrl, 0, 1);
+}
+
+/**
+ * \brief           Put record to ring buffer
+ * \param[in,out]   prbuf: Pointer to \ref microrl_hist_rbuf_t structure
+ * \param[in]       line: Record to save in history
+ * \param[in]       len: Record length
+ */
+static void prv_hist_save_line(microrl_hist_rbuf_t* prbuf, char* line, size_t len) {
+    if (len > (MICRORL_ARRAYSIZE(prbuf->ring_buf) - 1)) {
+        return;
+    }
+
+    /* Don't save the same line as the last record */
+    char last_record[MICRORL_CFG_CMDLINE_LEN + 1];
+    prv_hist_restore_line(prbuf, last_record, MICRORL_HIST_DIR_UP);
+    if (strcmp(line, last_record) == 0) {
+        prbuf->count = 0;
+        return;
+    }
+
+    while (prv_hist_is_space_for_new(prbuf, len) == MICRORL_HIST_FULL) {    /* Freeing up space for saving in the ring buffer */
+        prv_hist_erase_older(prbuf);
+    }
+
+    if (len < (MICRORL_ARRAYSIZE(prbuf->ring_buf) - prbuf->tail - 1)) {     /* Store record */
+        memcpy(prbuf->ring_buf + prbuf->tail + 1, line, len);
+    } else {
+        size_t part_len = MICRORL_ARRAYSIZE(prbuf->ring_buf) - prbuf->tail - 1;
+        memcpy(prbuf->ring_buf + prbuf->tail + 1, line, part_len);
+        memcpy(prbuf->ring_buf, line + part_len, len - part_len);
+    }
+
+    if (prbuf->head == prbuf->tail) {           /* Update position pointer and navigation counter */
+        ++prbuf->head;
+    }
+    prbuf->tail = prbuf->tail + len + 1;
+    if (prbuf->tail >= MICRORL_ARRAYSIZE(prbuf->ring_buf)) {
+        prbuf->tail -= MICRORL_ARRAYSIZE(prbuf->ring_buf);
+    }
+    prbuf->ring_buf[prbuf->tail] = 0;
+    prbuf->count = 0;
 }
 
 #endif /* MICRORL_CFG_USE_HISTORY || __DOXYGEN__ */

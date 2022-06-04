@@ -7,6 +7,7 @@
 2.  Add config `MICRORL_CFG_ECHO_OFF_MASK` for set the echo off masking character. By default the input is masked by `*`
 3.  Add single quotes `'` support in addition to double quotes `"`
 4.  Fix restoring the echo in `ECHO_ONCE` mode. Now if command line is empty in ECHO_ONCE mode and the user is pressed Enter, the echo will not switch to `ECHO_ON` mode
+5.  Now the same command as the last record in history isn't saved
 
 
 ## v2.2.3
