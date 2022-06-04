@@ -6,6 +6,7 @@
 1.  Add config `MICRORL_CFG_USE_ECHO_OFF` for enable/disable "echo off" feature in library. By default the feature is disabled
 2.  Add config `MICRORL_CFG_ECHO_OFF_MASK` for set the echo off masking character. By default the input is masked by `*`
 3.  Add single quotes `'` support in addition to double quotes `"`
+4.  Fix restoring the echo in `ECHO_ONCE` mode. Now if command line is empty in ECHO_ONCE mode and the user is pressed Enter, the echo will not switch to `ECHO_ON` mode
 
 
 ## v2.2.3

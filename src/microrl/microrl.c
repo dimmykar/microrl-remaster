@@ -666,7 +666,7 @@ static microrlr_t prv_handle_newline(microrl_t* mrl) {
 #endif /* MICRORL_CFG_USE_HISTORY */
 
 #if MICRORL_CFG_USE_ECHO_OFF
-    if (mrl->echo == MICRORL_ECHO_ONCE) {
+    if (mrl->echo == MICRORL_ECHO_ONCE && mrl->cmdline[mrl->echo_off_pos] != '\0') {
         microrl_set_echo(mrl, MICRORL_ECHO_ON);
         mrl->echo_off_pos = -1;
     }
