@@ -135,7 +135,7 @@ static microrlr_t prv_cmdline_buf_split(microrl_t* mrl, const char** tkn_arr, ui
         }
 
 #if MICRORL_CFG_USE_QUOTING
-        if (*str == '"') {                      /* Check if it starts with quote to handle escapes */
+        if (*str == '"' || *str == '\'') {      /* Check if it starts with quote to handle escapes */
             ++str;
             tkn_arr[num++] = str;               /* Set start of argument after quotes */
 
@@ -148,10 +148,10 @@ static microrlr_t prv_cmdline_buf_split(microrl_t* mrl, const char** tkn_arr, ui
 
                 if (*str == '\\') {
                     ++str;
-                    if (*str == '"') {
+                    if (*str == '"' || *str == '\'') {
                         ++str;
                     }
-                } else if (*str == '"') {
+                } else if (*str == '"' || *str == '\'') {
                     *str = '\0';
                     ++str;
                     break;
@@ -169,7 +169,7 @@ static microrlr_t prv_cmdline_buf_split(microrl_t* mrl, const char** tkn_arr, ui
                     return microrlOK;
                 }
 #if MICRORL_CFG_USE_QUOTING
-                if (*str == '"') {              /* Quote should not be here... */
+                if (*str == '"' || *str == '\'') {   /* Quote should not be here... */
                     *str = '\0';                /* ...add NULL termination to end token */
                 }
 #endif /* MICRORL_CFG_USE_QUOTING */
