@@ -3,6 +3,11 @@
 
 ## Develop
 
+
+
+
+## v2.3.0
+
 1.  Add config `MICRORL_CFG_USE_ECHO_OFF` for enable/disable "echo off" feature in library. By default the feature is disabled
 2.  Add config `MICRORL_CFG_ECHO_OFF_MASK` for set the echo off masking character. By default the input is masked by `*`
 3.  Add single quotes `'` support in addition to double quotes `"`
