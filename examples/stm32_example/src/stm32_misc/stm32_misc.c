@@ -304,8 +304,10 @@ int execute(microrl_t* mrl, int argc, const char* const *argv) {
     while (i < argc) {
         if (strcmp(argv[i], _CMD_HELP) == 0) {
             print_help(mrl);
+            return 0;
         } else if (strcmp(argv[i], _CMD_CLEAR) == 0) {
             clear_screen(mrl);
+            return 0;
         } else if (strcmp(argv[i], _CMD_SERNUM) == 0) {
             if (++i < argc) {
                 if (strcmp(argv[i], _SCMD_RD) == 0) {
@@ -315,6 +317,7 @@ int execute(microrl_t* mrl, int argc, const char* const *argv) {
                 } else {
                     set_sernum(mrl, (char*)argv[i]);
                 }
+                return 0;
             } else {
                 print(mrl, "Read or specify serial number, use Tab"_ENDLINE_SEQ);
                 return 1;
