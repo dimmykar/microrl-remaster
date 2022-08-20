@@ -739,7 +739,7 @@ static size_t prv_complite_total_len(char** arr) {
  * \param[in,out]   mrl: \ref microrl_t working instance
  * \return          \ref microrlOK on success, member of \ref microrlr_t enumeration otherwise
  */
-static microrlr_t prv_microrl_complite_get_input(microrl_t* mrl) {
+static microrlr_t prv_complite_get_input(microrl_t* mrl) {
     uint8_t tkn_count = 0;
     const char* tkn_arr[MICRORL_CFG_CMD_TOKEN_NMB] = {0};
     char** compl_token;
@@ -965,7 +965,7 @@ microrlr_t microrl_processing_input(microrl_t* mrl, const void* in_data, size_t 
                     if (mrl->get_completion_fn == NULL) {
                         return microrlERRPAR;
                     }
-                    if (prv_microrl_complite_get_input(mrl) != microrlOK) {
+                    if (prv_complite_get_input(mrl) != microrlOK) {
                         return microrlERRCPLT;
                     }
 #endif /* MICRORL_CFG_USE_COMPLETE */
