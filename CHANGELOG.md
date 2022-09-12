@@ -3,7 +3,7 @@
 
 ## Develop
 
-
+1.  Code refactoring to improve readability
 
 
 ## v2.3.0
