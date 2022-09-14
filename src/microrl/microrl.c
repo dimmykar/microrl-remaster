@@ -129,11 +129,6 @@ static microrlr_t prv_cmdline_buf_split(microrl_t* mrl, const char** tkn_arr, ui
 
     /* Process complete string */
     while (*str != '\0') {
-        while (*str == ' ' && ++str) {}         /* Remove leading whitespaces */
-        if (*str == '\0') {
-            break;
-        }
-
 #if MICRORL_CFG_USE_QUOTING
         if (*str == '"' || *str == '\'') {      /* Check if it starts with quote to handle escapes */
             ++str;
