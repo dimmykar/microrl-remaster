@@ -4,6 +4,7 @@
 ## Develop
 
 1.  Code refactoring to improve readability
+2.  Skip completion (TAB) if echo is OFF
 
 
 ## v2.3.0

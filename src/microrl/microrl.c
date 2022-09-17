@@ -744,6 +744,11 @@ static size_t prv_complite_total_len(const char* const * argv) {
  * \return          \ref microrlOK on success, member of \ref microrlr_t enumeration otherwise
  */
 static microrlr_t prv_complite_get_input(microrl_t* mrl) {
+    /* Skip completion when echo is OFF */
+    if (mrl->echo != MICRORL_ECHO_ON) {
+        return microrlOK;
+    }
+
     uint8_t tkn_count = 0;
     const char* tkn_arr[MICRORL_CFG_CMD_TOKEN_NMB] = {0};
     char** compl_token;
