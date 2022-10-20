@@ -666,16 +666,18 @@ static microrlr_t prv_handle_newline(microrl_t* mrl) {
 
     prv_terminal_newline(mrl);
 
-#if MICRORL_CFG_USE_HISTORY
-    if (mrl->cmdlen > 0) {
-#if MICRORL_CFG_USE_ECHO_OFF
-        if (mrl->echo == MICRORL_ECHO_ON) {
-#endif /* MICRORL_CFG_USE_ECHO_OFF */
-            prv_hist_save_line(&mrl->ring_hist, mrl->cmdline, mrl->cmdlen);
-#if MICRORL_CFG_USE_ECHO_OFF
-        }
-#endif /* MICRORL_CFG_USE_ECHO_OFF */
+    if (mrl->cmdlen == 0) {
+        goto exit;
     }
+
+#if MICRORL_CFG_USE_HISTORY
+#if MICRORL_CFG_USE_ECHO_OFF
+    if (mrl->echo == MICRORL_ECHO_ON) {
+#endif /* MICRORL_CFG_USE_ECHO_OFF */
+        prv_hist_save_line(&mrl->ring_hist, mrl->cmdline, mrl->cmdlen);
+#if MICRORL_CFG_USE_ECHO_OFF
+    }
+#endif /* MICRORL_CFG_USE_ECHO_OFF */
 #endif /* MICRORL_CFG_USE_HISTORY */
 
 #if MICRORL_CFG_USE_ECHO_OFF
@@ -703,6 +705,7 @@ static microrlr_t prv_handle_newline(microrl_t* mrl) {
         prv_terminal_newline(mrl);
     }
 
+exit:
     prv_terminal_print_prompt(mrl);
     prv_cmdline_buf_reset(mrl);
 
