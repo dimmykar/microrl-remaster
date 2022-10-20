@@ -5,6 +5,8 @@
 
 1.  Code refactoring to improve readability
 2.  Skip completion (TAB) if echo is OFF
+3.  Fix skipping saving the same command as last record in history
+    - Previously, if the last record was restored from the history by pressing UP key and executed, then it was still saved
 
 
 ## v2.3.0

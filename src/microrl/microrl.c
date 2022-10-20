@@ -111,7 +111,8 @@ typedef enum {
  * \brief           Direction of history navigation
  */
 typedef enum {
-    MICRORL_HIST_DIR_UP = 0,                        /*!< Previous record in history ring buffer */
+    MICRORL_HIST_DIR_NONE = 0,                      /*!< Current record in history ring buffer */
+    MICRORL_HIST_DIR_UP,                            /*!< Previous record in history ring buffer */
     MICRORL_HIST_DIR_DOWN                           /*!< Next record in history ring buffer */
 } microrl_hist_dir_t;
 
@@ -486,7 +487,7 @@ static size_t prv_hist_restore_line(microrl_hist_rbuf_t* prbuf, char* line, micr
         if (cnt != prbuf->count) {
             ++prbuf->count;
         }
-    } else {
+    } else if (dir == MICRORL_HIST_DIR_DOWN) {
         if (prbuf->count == 0) {
             return 0;                           /* Empty line */
         }
@@ -546,7 +547,8 @@ static void prv_hist_save_line(microrl_hist_rbuf_t* prbuf, char* line, size_t le
 
     /* Don't save the same line as the last record */
     char last_record[MICRORL_CFG_CMDLINE_LEN + 1];
-    prv_hist_restore_line(prbuf, last_record, MICRORL_HIST_DIR_UP);
+    prv_hist_restore_line(prbuf, last_record,
+                              prbuf->count == 1 ? MICRORL_HIST_DIR_NONE : MICRORL_HIST_DIR_UP);
     if (strcmp(line, last_record) == 0) {
         prbuf->count = 0;
         return;
