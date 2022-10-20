@@ -3,6 +3,11 @@
 
 ## Develop
 
+
+
+
+## v2.3.1
+
 1.  Code refactoring to improve readability
 2.  Skip completion (TAB) if echo is OFF
 3.  Fix skipping saving the same command as last record in history
