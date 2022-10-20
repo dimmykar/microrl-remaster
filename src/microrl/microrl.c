@@ -225,7 +225,7 @@ static microrlr_t prv_cmdline_buf_insert_text(microrl_t* mrl, const char* text, 
  */
 static void prv_cmdline_buf_backspace(microrl_t* mrl, size_t len) {
     if (mrl->cursor < len) {
-    	return;
+        return;
     }
 
     memmove(mrl->cmdline + mrl->cursor - len,
@@ -348,7 +348,7 @@ static char* prv_cursor_generate_move(char* str, int32_t offset) {
  */
 static void prv_terminal_move_cursor(microrl_t* mrl, int32_t offset) {
     if (offset == 0) {
-    	return;
+        return;
     }
 
     char str[16] = {0};
@@ -760,7 +760,7 @@ static microrlr_t prv_complite_get_input(microrl_t* mrl) {
     }
 
     if (mrl->cmdline[mrl->cursor - 1] == '\0') {
-    	/* Last char is whitespace */
+        /* Last char is whitespace */
         tkn_arr[tkn_count++] = "";
         tkn_arr[tkn_count] = NULL;
     }
