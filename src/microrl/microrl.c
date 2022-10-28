@@ -992,7 +992,7 @@ microrlr_t microrl_processing_input(microrl_t* mrl, const void* in_data, size_t 
             }
             case MICRORL_ESQ_ANSI_ESC: {
 #if MICRORL_CFG_USE_ESC_SEQ
-              mrl->escape = 1;
+                mrl->escape = 1;
 #endif /* MICRORL_CFG_USE_ESC_SEQ */
                 break;
             }
@@ -1036,12 +1036,12 @@ microrlr_t microrl_processing_input(microrl_t* mrl, const void* in_data, size_t 
 #if MICRORL_CFG_USE_HISTORY
 
 #if MICRORL_CFG_USE_ECHO_OFF
-            if (mrl->echo != MICRORL_ECHO_ON) {
-                break;
-            }
+                if (mrl->echo != MICRORL_ECHO_ON) {
+                    break;
+                }
 #endif /* MICRORL_CFG_USE_ECHO_OFF */
 
-            prv_hist_search(mrl, MICRORL_HIST_DIR_UP);
+                prv_hist_search(mrl, MICRORL_HIST_DIR_UP);
 #endif /* MICRORL_CFG_USE_HISTORY */
 
                 break;
@@ -1054,7 +1054,7 @@ microrlr_t microrl_processing_input(microrl_t* mrl, const void* in_data, size_t 
             }
 #endif /* MICRORL_CFG_USE_ECHO_OFF */
 
-            prv_hist_search(mrl, MICRORL_HIST_DIR_DOWN);
+                prv_hist_search(mrl, MICRORL_HIST_DIR_DOWN);
 #endif /* MICRORL_CFG_USE_HISTORY */
 
                 break;
