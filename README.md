@@ -80,7 +80,7 @@ a) Include `microrl.h` file to you project.
 b) Create `microrl_t` object, and call `microrl_init()` func, with print callback pointer and your routine callback pointer, that will be called if user press Enter in terminal.<br>
 Print callback pointer is pointer to function that call by library if it's need to put text to terminal. Text string always is null terminated.
 For example on linux PC print callback may be:
-```
+```c
 /* Print callback for microrl library */
 int print(microrl_t* mrl, char* str) {
     return fprintf(stdout, "%s", str);
@@ -95,7 +95,7 @@ d) Rename `microrl_user_config_template.h` to `microrl_user_config.h`. Look at `
 e) Now you just call `microrl_processing_input()` on each input string (or one char) received from input stream (usart, network, etc).
 
 Example of code:
-```
+```c
 int main (int argc, char** argv) {
     /* Create microrl instance */
     microrl_t rl;
