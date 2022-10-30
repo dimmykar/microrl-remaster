@@ -635,10 +635,10 @@ static uint8_t prv_escape_process(microrl_t* mrl, char ch) {
                 --mrl->cursor;
             }
             return 1;
-        } else if (ch == '7') {
+        } else if (ch == '7' || ch == '1') {
             mrl->esc_code = MICRORL_ESC_HOME;
             return 0;
-        } else if (ch == '8') {
+        } else if (ch == '8' || ch == '4') {
             mrl->esc_code = MICRORL_ESC_END;
             return 0;
         } else if (ch == '3') {

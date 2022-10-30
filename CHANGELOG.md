@@ -5,6 +5,7 @@
 
 1.  Add DELETE key support
 2.  Add Alt+Backspace support
+3.  Add new ESC codes for HOME and END keys
 
 
 ## v2.3.1
