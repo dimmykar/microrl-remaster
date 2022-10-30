@@ -57,47 +57,47 @@
 #warning "Unknown compiler. 'inline' keyword is not set"
 #endif /* defined(__GNUC__) */
 
-#define IS_CONTROL_CHAR(x)                  ((x) <= 31 || (x) == MICRORL_ESQ_ANSI_DEL)
+#define IS_CONTROL_CHAR(x)                  ((x) <= 31 || (x) == MICRORL_ESC_ANSI_DEL)
 
 /**
  * \brief           List of ANSI escape codes
  */
 typedef enum {
-    MICRORL_ESQ_ANSI_NUL = 0x00,                    /*!< ^@ Null character */
-    MICRORL_ESQ_ANSI_SOH = 0x01,                    /*!< ^A Start of heading, = console interrupt */
-    MICRORL_ESQ_ANSI_STX = 0x02,                    /*!< ^B Start of text, maintenance mode on HP console */
-    MICRORL_ESQ_ANSI_ETX = 0x03,                    /*!< ^C End of text */
-    MICRORL_ESQ_ANSI_EOT = 0x04,                    /*!< ^D End of transmission, not the same as ETB */
-    MICRORL_ESQ_ANSI_ENQ = 0x05,                    /*!< ^E Enquiry, goes with ACK; old HP flow control */
-    MICRORL_ESQ_ANSI_ACK = 0x06,                    /*!< ^F Acknowledge, clears ENQ logon hand */
-    MICRORL_ESQ_ANSI_BEL = 0x07,                    /*!< ^G Bell, rings the bell... */
-    MICRORL_ESQ_ANSI_BS = 0x08,                     /*!< ^H Backspace, works on HP terminals/computers */
-    MICRORL_ESQ_ANSI_HT = 0x09,                     /*!< ^I Horizontal tab, move to next tab stop */
-    MICRORL_ESQ_ANSI_LF = 0x0A,                     /*!< ^J Line Feed */
-    MICRORL_ESQ_ANSI_VT = 0x0B,                     /*!< ^K Vertical tab */
-    MICRORL_ESQ_ANSI_FF = 0x0C,                     /*!< ^L Form Feed, page eject */
-    MICRORL_ESQ_ANSI_CR = 0x0D,                     /*!< ^M Carriage Return */
-    MICRORL_ESQ_ANSI_SO = 0x0E,                     /*!< ^N Shift Out, alternate character set */
-    MICRORL_ESQ_ANSI_SI = 0x0F,                     /*!< ^O Shift In, resume defaultn character set */
-    MICRORL_ESQ_ANSI_DLE = 0x10,                    /*!< ^P Data link escape */
-    MICRORL_ESQ_ANSI_DC1 = 0x11,                    /*!< ^Q XON, with XOFF to pause listings; "okay to send". */
-    MICRORL_ESQ_ANSI_DC2 = 0x12,                    /*!< ^R Device control 2, block-mode flow control */
-    MICRORL_ESQ_ANSI_DC3 = 0x13,                    /*!< ^S XOFF, with XON is TERM=18 flow control */
-    MICRORL_ESQ_ANSI_DC4 = 0x14,                    /*!< ^T Device control 4 */
-    MICRORL_ESQ_ANSI_NAK = 0x15,                    /*!< ^U Negative acknowledge */
-    MICRORL_ESQ_ANSI_SYN = 0x16,                    /*!< ^V Synchronous idle */
-    MICRORL_ESQ_ANSI_ETB = 0x17,                    /*!< ^W End transmission block, not the same as EOT */
-    MICRORL_ESQ_ANSI_CAN = 0x18,                    /*!< ^X Cancel line, MPE echoes !!! */
-    MICRORL_ESQ_ANSI_EM = 0x19,                     /*!< ^Y End of medium, Control-Y interrupt */
-    MICRORL_ESQ_ANSI_SUB = 0x1A,                    /*!< ^Z Substitute */
-    MICRORL_ESQ_ANSI_ESC = 0x1B,                    /*!< ^[ Escape, next character is not echoed */
-    MICRORL_ESQ_ANSI_FS = 0x1C,                     /*!< ^\ File separator */
-    MICRORL_ESQ_ANSI_GS = 0x1D,                     /*!< ^] Group separator */
-    MICRORL_ESQ_ANSI_RS = 0x1E,                     /*!< ^^ Record separator, block-mode terminator */
-    MICRORL_ESQ_ANSI_US = 0x1F,                     /*!< ^_ Unit separator */
+    MICRORL_ESC_ANSI_NUL = 0x00,                    /*!< ^@ Null character */
+    MICRORL_ESC_ANSI_SOH = 0x01,                    /*!< ^A Start of heading, = console interrupt */
+    MICRORL_ESC_ANSI_STX = 0x02,                    /*!< ^B Start of text, maintenance mode on HP console */
+    MICRORL_ESC_ANSI_ETX = 0x03,                    /*!< ^C End of text */
+    MICRORL_ESC_ANSI_EOT = 0x04,                    /*!< ^D End of transmission, not the same as ETB */
+    MICRORL_ESC_ANSI_ENQ = 0x05,                    /*!< ^E Enquiry, goes with ACK; old HP flow control */
+    MICRORL_ESC_ANSI_ACK = 0x06,                    /*!< ^F Acknowledge, clears ENQ logon hand */
+    MICRORL_ESC_ANSI_BEL = 0x07,                    /*!< ^G Bell, rings the bell... */
+    MICRORL_ESC_ANSI_BS = 0x08,                     /*!< ^H Backspace, works on HP terminals/computers */
+    MICRORL_ESC_ANSI_HT = 0x09,                     /*!< ^I Horizontal tab, move to next tab stop */
+    MICRORL_ESC_ANSI_LF = 0x0A,                     /*!< ^J Line Feed */
+    MICRORL_ESC_ANSI_VT = 0x0B,                     /*!< ^K Vertical tab */
+    MICRORL_ESC_ANSI_FF = 0x0C,                     /*!< ^L Form Feed, page eject */
+    MICRORL_ESC_ANSI_CR = 0x0D,                     /*!< ^M Carriage Return */
+    MICRORL_ESC_ANSI_SO = 0x0E,                     /*!< ^N Shift Out, alternate character set */
+    MICRORL_ESC_ANSI_SI = 0x0F,                     /*!< ^O Shift In, resume defaultn character set */
+    MICRORL_ESC_ANSI_DLE = 0x10,                    /*!< ^P Data link escape */
+    MICRORL_ESC_ANSI_DC1 = 0x11,                    /*!< ^Q XON, with XOFF to pause listings; "okay to send". */
+    MICRORL_ESC_ANSI_DC2 = 0x12,                    /*!< ^R Device control 2, block-mode flow control */
+    MICRORL_ESC_ANSI_DC3 = 0x13,                    /*!< ^S XOFF, with XON is TERM=18 flow control */
+    MICRORL_ESC_ANSI_DC4 = 0x14,                    /*!< ^T Device control 4 */
+    MICRORL_ESC_ANSI_NAK = 0x15,                    /*!< ^U Negative acknowledge */
+    MICRORL_ESC_ANSI_SYN = 0x16,                    /*!< ^V Synchronous idle */
+    MICRORL_ESC_ANSI_ETB = 0x17,                    /*!< ^W End transmission block, not the same as EOT */
+    MICRORL_ESC_ANSI_CAN = 0x18,                    /*!< ^X Cancel line, MPE echoes !!! */
+    MICRORL_ESC_ANSI_EM = 0x19,                     /*!< ^Y End of medium, Control-Y interrupt */
+    MICRORL_ESC_ANSI_SUB = 0x1A,                    /*!< ^Z Substitute */
+    MICRORL_ESC_ANSI_ESC = 0x1B,                    /*!< ^[ Escape, next character is not echoed */
+    MICRORL_ESC_ANSI_FS = 0x1C,                     /*!< ^\ File separator */
+    MICRORL_ESC_ANSI_GS = 0x1D,                     /*!< ^] Group separator */
+    MICRORL_ESC_ANSI_RS = 0x1E,                     /*!< ^^ Record separator, block-mode terminator */
+    MICRORL_ESC_ANSI_US = 0x1F,                     /*!< ^_ Unit separator */
 
-    MICRORL_ESQ_ANSI_DEL = 0x7F                     /*!< Delete (not a real control character...) */
-} microrl_esq_ansi_t;
+    MICRORL_ESC_ANSI_DEL = 0x7F                     /*!< Delete (not a real control character...) */
+} microrl_esc_ansi_t;
 
 /**
  * \brief           History ring buffer memory status
@@ -590,7 +590,7 @@ static uint8_t prv_escape_process(microrl_t* mrl, char ch) {
     if (ch == '[') {
         mrl->esc_code = MICRORL_ESC_BRACKET;
         return 0;
-    } else if (ch == MICRORL_ESQ_ANSI_DEL) {    /* Alt+BACKSPACE */
+    } else if (ch == MICRORL_ESC_ANSI_DEL) {    /* Alt+BACKSPACE */
         prv_cmdline_buf_delete(mrl);
         prv_terminal_print_line(mrl, mrl->cursor, 0);
         return 1;
@@ -954,7 +954,7 @@ microrlr_t microrl_set_echo(microrl_t* mrl, microrl_echo_t echo) {
  */
 static microrlr_t prv_process_control_char(microrl_t* mrl, char ch) {
     switch(ch) {
-        case MICRORL_ESQ_ANSI_HT: {
+        case MICRORL_ESC_ANSI_HT: {
 #if MICRORL_CFG_USE_COMPLETE
             if (mrl->get_completion_fn == NULL) {
                 return microrlERRPAR;
@@ -965,49 +965,49 @@ static microrlr_t prv_process_control_char(microrl_t* mrl, char ch) {
 #endif /* MICRORL_CFG_USE_COMPLETE */
             break;
         }
-        case MICRORL_ESQ_ANSI_ESC: {
+        case MICRORL_ESC_ANSI_ESC: {
 #if MICRORL_CFG_USE_ESC_SEQ
             mrl->escape = 1;
 #endif /* MICRORL_CFG_USE_ESC_SEQ */
             break;
         }
-        case MICRORL_ESQ_ANSI_NAK: { /* ^U */
+        case MICRORL_ESC_ANSI_NAK: { /* ^U */
             if (mrl->cursor > 0) {
                 prv_cmdline_buf_backspace(mrl, mrl->cursor);
             }
             prv_terminal_print_line(mrl, 0, 1);
             break;
         }
-        case MICRORL_ESQ_ANSI_VT: { /* ^K */
+        case MICRORL_ESC_ANSI_VT: { /* ^K */
             mrl->out_fn(mrl, "\033[K");
             mrl->cmdlen = mrl->cursor;
             break;
         }
-        case MICRORL_ESQ_ANSI_ENQ: { /* ^E */
+        case MICRORL_ESC_ANSI_ENQ: { /* ^E */
             prv_terminal_move_cursor(mrl, mrl->cmdlen - mrl->cursor);
             mrl->cursor = mrl->cmdlen;
             break;
         }
-        case MICRORL_ESQ_ANSI_SOH: { /* ^A */
+        case MICRORL_ESC_ANSI_SOH: { /* ^A */
             prv_terminal_move_cursor(mrl, -mrl->cursor);
             mrl->cursor = 0;
             break;
         }
-        case MICRORL_ESQ_ANSI_ACK: { /* ^F */
+        case MICRORL_ESC_ANSI_ACK: { /* ^F */
             if (mrl->cursor < mrl->cmdlen) {
                 prv_terminal_move_cursor(mrl, 1);
                 ++mrl->cursor;
             }
             break;
         }
-        case MICRORL_ESQ_ANSI_STX: { /* ^B */
+        case MICRORL_ESC_ANSI_STX: { /* ^B */
             if (mrl->cursor != 0) {
                 prv_terminal_move_cursor(mrl, -1);
                 --mrl->cursor;
             }
             break;
         }
-        case MICRORL_ESQ_ANSI_DLE: { /* ^P */
+        case MICRORL_ESC_ANSI_DLE: { /* ^P */
 #if MICRORL_CFG_USE_HISTORY
 
 #if MICRORL_CFG_USE_ECHO_OFF
@@ -1021,7 +1021,7 @@ static microrlr_t prv_process_control_char(microrl_t* mrl, char ch) {
 
             break;
         }
-        case MICRORL_ESQ_ANSI_SO: { /* ^N */
+        case MICRORL_ESC_ANSI_SO: { /* ^N */
 #if MICRORL_CFG_USE_HISTORY
 #if MICRORL_CFG_USE_ECHO_OFF
         if (mrl->echo != MICRORL_ECHO_ON) {
@@ -1034,8 +1034,8 @@ static microrlr_t prv_process_control_char(microrl_t* mrl, char ch) {
 
             break;
         }
-        case MICRORL_ESQ_ANSI_DEL:  /* Backspace */
-        case MICRORL_ESQ_ANSI_BS: { /* ^H */
+        case MICRORL_ESC_ANSI_DEL:  /* Backspace */
+        case MICRORL_ESC_ANSI_BS: { /* ^H */
             if (mrl->cursor > 0) {
                 prv_cmdline_buf_backspace(mrl, 1);
                 if (mrl->cursor == mrl->cmdlen) {
@@ -1046,18 +1046,18 @@ static microrlr_t prv_process_control_char(microrl_t* mrl, char ch) {
             }
             break;
         }
-        case MICRORL_ESQ_ANSI_EOT: { /* ^D */
+        case MICRORL_ESC_ANSI_EOT: { /* ^D */
             prv_cmdline_buf_delete(mrl);
             prv_terminal_print_line(mrl, mrl->cursor, 0);
             break;
         }
-        case MICRORL_ESQ_ANSI_DC2: { /* ^R */
+        case MICRORL_ESC_ANSI_DC2: { /* ^R */
             prv_terminal_newline(mrl);
             prv_terminal_print_prompt(mrl);
             prv_terminal_print_line(mrl, 0, 0);
             break;
         }
-        case MICRORL_ESQ_ANSI_ETX: {
+        case MICRORL_ESC_ANSI_ETX: {
 #if MICRORL_CFG_USE_CTRL_C
             if (mrl->sigint_fn == NULL) {
                 return microrlERRPAR;
@@ -1125,12 +1125,12 @@ microrlr_t microrl_processing_input(microrl_t* mrl, const void* in_data, size_t 
         }
 #endif /* MICRORL_CFG_USE_ESC_SEQ */
 
-        if ((ch == MICRORL_ESQ_ANSI_CR) || (ch == MICRORL_ESQ_ANSI_LF)) {
+        if ((ch == MICRORL_ESC_ANSI_CR) || (ch == MICRORL_ESC_ANSI_LF)) {
             /*
              * Only trigger a newline if `ch` doen't follow its companion's
              * triggering a newline.
              */
-            if (mrl->last_endl == (ch == MICRORL_ESQ_ANSI_CR ? MICRORL_ESQ_ANSI_LF : MICRORL_ESQ_ANSI_CR)) {
+            if (mrl->last_endl == (ch == MICRORL_ESC_ANSI_CR ? MICRORL_ESC_ANSI_LF : MICRORL_ESC_ANSI_CR)) {
                 mrl->last_endl = 0;         /* Ignore char, but clear newline state */
             } else {
                 mrl->last_endl = ch;
