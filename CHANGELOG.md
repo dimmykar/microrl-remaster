@@ -3,7 +3,7 @@
 
 ## Develop
 
-
+1.  Add DELETE key support
 
 
 ## v2.3.1

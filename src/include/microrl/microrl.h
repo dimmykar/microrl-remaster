@@ -74,7 +74,8 @@ typedef enum {
 typedef enum {
     MICRORL_ESC_BRACKET,                        /*!< Encountered '[' character after ESQ code */
     MICRORL_ESC_HOME,                           /*!< Encountered 'HOME' code after ESQ code */
-    MICRORL_ESC_END                             /*!< Encountered 'END' code after ESQ code */
+    MICRORL_ESC_END,                            /*!< Encountered 'END' code after ESQ code */
+    MICRORL_ESC_DEL                             /*!< Encountered 'DEL' code after ESQ code */
 } microrl_esq_code_t;
 
 #if MICRORL_CFG_USE_ECHO_OFF || __DOXYGEN__

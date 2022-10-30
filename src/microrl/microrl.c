@@ -637,6 +637,9 @@ static uint8_t prv_escape_process(microrl_t* mrl, char ch) {
         } else if (ch == '8') {
             mrl->esc_code = MICRORL_ESC_END;
             return 0;
+        } else if (ch == '3') {
+            mrl->esc_code = MICRORL_ESC_DEL;
+            return 0;
         }
     } else if (ch == '~') {
         if (mrl->esc_code == MICRORL_ESC_HOME) {
@@ -646,6 +649,10 @@ static uint8_t prv_escape_process(microrl_t* mrl, char ch) {
         } else if (mrl->esc_code == MICRORL_ESC_END) {
             prv_terminal_move_cursor(mrl, mrl->cmdlen - mrl->cursor);
             mrl->cursor = mrl->cmdlen;
+            return 1;
+        } else if (mrl->esc_code == MICRORL_ESC_DEL) {
+            prv_cmdline_buf_delete(mrl);
+            prv_terminal_print_line(mrl, mrl->cursor, 0);
             return 1;
         }
     }
