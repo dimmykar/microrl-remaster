@@ -4,6 +4,7 @@
 ## Develop
 
 1.  Add DELETE key support
+2.  Add Alt+Backspace support
 
 
 ## v2.3.1

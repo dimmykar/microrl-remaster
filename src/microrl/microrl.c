@@ -590,6 +590,10 @@ static uint8_t prv_escape_process(microrl_t* mrl, char ch) {
     if (ch == '[') {
         mrl->esc_code = MICRORL_ESC_BRACKET;
         return 0;
+    } else if (ch == MICRORL_ESQ_ANSI_DEL) {
+        prv_cmdline_buf_delete(mrl);
+        prv_terminal_print_line(mrl, mrl->cursor, 0);
+        return 1;
     } else if (mrl->esc_code == MICRORL_ESC_BRACKET) {
         if (ch == 'A') {
 #if MICRORL_CFG_USE_HISTORY
