@@ -57,7 +57,7 @@
 #warning "Unknown compiler. 'inline' keyword is not set"
 #endif /* defined(__GNUC__) */
 
-#define IS_CONTROL_CHAR(x)                  ((x) <= 31)
+#define IS_CONTROL_CHAR(x)                  ((x) <= 31 || (x) == MICRORL_ESQ_ANSI_DEL)
 
 /**
  * \brief           List of ANSI escape codes
@@ -947,6 +947,159 @@ microrlr_t microrl_set_echo(microrl_t* mrl, microrl_echo_t echo) {
 #endif /* MICRORL_CFG_USE_ECHO_OFF || __DOXYGEN__ */
 
 /**
+ * \brief           Process ANSI control key
+ * \param[in,out]   mrl: \ref microrl_t working instance
+ * \param[in]       ch: Input char to process
+ * \return          \ref microrlOK on success, member of \ref microrlr_t enumeration otherwise
+ */
+static microrlr_t prv_process_control_char(microrl_t* mrl, char ch) {
+    switch(ch) {
+        case MICRORL_ESQ_ANSI_HT: {
+#if MICRORL_CFG_USE_COMPLETE
+            if (mrl->get_completion_fn == NULL) {
+                return microrlERRPAR;
+            }
+            if (prv_complite_get_input(mrl) != microrlOK) {
+                return microrlERRCPLT;
+            }
+#endif /* MICRORL_CFG_USE_COMPLETE */
+            break;
+        }
+        case MICRORL_ESQ_ANSI_ESC: {
+#if MICRORL_CFG_USE_ESC_SEQ
+            mrl->escape = 1;
+#endif /* MICRORL_CFG_USE_ESC_SEQ */
+            break;
+        }
+        case MICRORL_ESQ_ANSI_NAK: { /* ^U */
+            if (mrl->cursor > 0) {
+                prv_cmdline_buf_backspace(mrl, mrl->cursor);
+            }
+            prv_terminal_print_line(mrl, 0, 1);
+            break;
+        }
+        case MICRORL_ESQ_ANSI_VT: { /* ^K */
+            mrl->out_fn(mrl, "\033[K");
+            mrl->cmdlen = mrl->cursor;
+            break;
+        }
+        case MICRORL_ESQ_ANSI_ENQ: { /* ^E */
+            prv_terminal_move_cursor(mrl, mrl->cmdlen - mrl->cursor);
+            mrl->cursor = mrl->cmdlen;
+            break;
+        }
+        case MICRORL_ESQ_ANSI_SOH: { /* ^A */
+            prv_terminal_move_cursor(mrl, -mrl->cursor);
+            mrl->cursor = 0;
+            break;
+        }
+        case MICRORL_ESQ_ANSI_ACK: { /* ^F */
+            if (mrl->cursor < mrl->cmdlen) {
+                prv_terminal_move_cursor(mrl, 1);
+                ++mrl->cursor;
+            }
+            break;
+        }
+        case MICRORL_ESQ_ANSI_STX: { /* ^B */
+            if (mrl->cursor != 0) {
+                prv_terminal_move_cursor(mrl, -1);
+                --mrl->cursor;
+            }
+            break;
+        }
+        case MICRORL_ESQ_ANSI_DLE: { /* ^P */
+#if MICRORL_CFG_USE_HISTORY
+
+#if MICRORL_CFG_USE_ECHO_OFF
+            if (mrl->echo != MICRORL_ECHO_ON) {
+                break;
+            }
+#endif /* MICRORL_CFG_USE_ECHO_OFF */
+
+            prv_hist_search(mrl, MICRORL_HIST_DIR_UP);
+#endif /* MICRORL_CFG_USE_HISTORY */
+
+            break;
+        }
+        case MICRORL_ESQ_ANSI_SO: { /* ^N */
+#if MICRORL_CFG_USE_HISTORY
+#if MICRORL_CFG_USE_ECHO_OFF
+        if (mrl->echo != MICRORL_ECHO_ON) {
+            break;
+        }
+#endif /* MICRORL_CFG_USE_ECHO_OFF */
+
+            prv_hist_search(mrl, MICRORL_HIST_DIR_DOWN);
+#endif /* MICRORL_CFG_USE_HISTORY */
+
+            break;
+        }
+        case MICRORL_ESQ_ANSI_DEL:  /* Backspace */
+        case MICRORL_ESQ_ANSI_BS: { /* ^H */
+            if (mrl->cursor > 0) {
+                prv_cmdline_buf_backspace(mrl, 1);
+                if (mrl->cursor == mrl->cmdlen) {
+                    prv_terminal_backspace(mrl);
+                } else {
+                    prv_terminal_print_line(mrl, mrl->cursor, 1);
+                }
+            }
+            break;
+        }
+        case MICRORL_ESQ_ANSI_EOT: { /* ^D */
+            prv_cmdline_buf_delete(mrl);
+            prv_terminal_print_line(mrl, mrl->cursor, 0);
+            break;
+        }
+        case MICRORL_ESQ_ANSI_DC2: { /* ^R */
+            prv_terminal_newline(mrl);
+            prv_terminal_print_prompt(mrl);
+            prv_terminal_print_line(mrl, 0, 0);
+            break;
+        }
+        case MICRORL_ESQ_ANSI_ETX: {
+#if MICRORL_CFG_USE_CTRL_C
+            if (mrl->sigint_fn == NULL) {
+                return microrlERRPAR;
+            }
+            mrl->sigint_fn(mrl);
+#endif /* MICRORL_CFG_USE_CTRL_C */
+            break;
+        }
+        default:
+            break;
+    }
+
+    return microrlOK;
+}
+
+/**
+ * \brief           Print character in terminal
+ * \param[in,out]   mrl: \ref microrl_t working instance
+ * \param[in]       ch: Character to print
+ * \return          \ref microrlOK on success, member of \ref microrlr_t enumeration otherwise
+ */
+static microrlr_t prv_insert_char(microrl_t* mrl, char ch) {
+    if (prv_cmdline_buf_insert_text(mrl, &ch, 1) != microrlOK) {
+        return microrlERRCLFULL;
+    }
+    if (mrl->cursor == mrl->cmdlen) {
+        char nch[] = {0, 0};
+        nch[0] = ch;
+#if MICRORL_CFG_USE_ECHO_OFF
+        if (((int32_t)mrl->cursor >= mrl->echo_off_pos) && (mrl->echo != MICRORL_ECHO_ON)) {
+            nch[0] = MICRORL_CFG_ECHO_OFF_MASK;
+        }
+#endif /* MICRORL_CFG_USE_ECHO_OFF */
+        mrl->out_fn(mrl, nch);
+    } else {
+        prv_terminal_print_line(mrl, mrl->cursor - 1, 0);
+    }
+
+    return microrlOK;
+}
+
+/**
  * \brief           Processing command line input
  * \param[in]       mrl: \ref microrl_t working instance
  * \param[in]       in_data: Input data to process
@@ -989,142 +1142,20 @@ microrlr_t microrl_processing_input(microrl_t* mrl, const void* in_data, size_t 
         }
         mrl->last_endl = 0;
 
-        switch(ch) {
-            case MICRORL_ESQ_ANSI_HT: {
-#if MICRORL_CFG_USE_COMPLETE
-                if (mrl->get_completion_fn == NULL) {
-                    return microrlERRPAR;
-                }
-                if (prv_complite_get_input(mrl) != microrlOK) {
-                    return microrlERRCPLT;
-                }
-#endif /* MICRORL_CFG_USE_COMPLETE */
+        microrlr_t res = microrlOK;
+        if (IS_CONTROL_CHAR(ch)) {
+            res = prv_process_control_char(mrl, ch);
+        } else {
+            if (((ch == ' ') && (mrl->cmdlen == 0)) || IS_CONTROL_CHAR(ch)) {   /* Skip spaces in first command line symbol or escapes */
                 break;
             }
-            case MICRORL_ESQ_ANSI_ESC: {
-#if MICRORL_CFG_USE_ESC_SEQ
-                mrl->escape = 1;
-#endif /* MICRORL_CFG_USE_ESC_SEQ */
-                break;
-            }
-            case MICRORL_ESQ_ANSI_NAK: { /* ^U */
-                if (mrl->cursor > 0) {
-                    prv_cmdline_buf_backspace(mrl, mrl->cursor);
-                }
-                prv_terminal_print_line(mrl, 0, 1);
-                break;
-            }
-            case MICRORL_ESQ_ANSI_VT: { /* ^K */
-                mrl->out_fn(mrl, "\033[K");
-                mrl->cmdlen = mrl->cursor;
-                break;
-            }
-            case MICRORL_ESQ_ANSI_ENQ: { /* ^E */
-                prv_terminal_move_cursor(mrl, mrl->cmdlen - mrl->cursor);
-                mrl->cursor = mrl->cmdlen;
-                break;
-            }
-            case MICRORL_ESQ_ANSI_SOH: { /* ^A */
-                prv_terminal_move_cursor(mrl, -mrl->cursor);
-                mrl->cursor = 0;
-                break;
-            }
-            case MICRORL_ESQ_ANSI_ACK: { /* ^F */
-                if (mrl->cursor < mrl->cmdlen) {
-                    prv_terminal_move_cursor(mrl, 1);
-                    ++mrl->cursor;
-                }
-                break;
-            }
-            case MICRORL_ESQ_ANSI_STX: { /* ^B */
-                if (mrl->cursor != 0) {
-                    prv_terminal_move_cursor(mrl, -1);
-                    --mrl->cursor;
-                }
-                break;
-            }
-            case MICRORL_ESQ_ANSI_DLE: { /* ^P */
-#if MICRORL_CFG_USE_HISTORY
-
-#if MICRORL_CFG_USE_ECHO_OFF
-                if (mrl->echo != MICRORL_ECHO_ON) {
-                    break;
-                }
-#endif /* MICRORL_CFG_USE_ECHO_OFF */
-
-                prv_hist_search(mrl, MICRORL_HIST_DIR_UP);
-#endif /* MICRORL_CFG_USE_HISTORY */
-
-                break;
-            }
-            case MICRORL_ESQ_ANSI_SO: { /* ^N */
-#if MICRORL_CFG_USE_HISTORY
-#if MICRORL_CFG_USE_ECHO_OFF
-            if (mrl->echo != MICRORL_ECHO_ON) {
-                break;
-            }
-#endif /* MICRORL_CFG_USE_ECHO_OFF */
-
-                prv_hist_search(mrl, MICRORL_HIST_DIR_DOWN);
-#endif /* MICRORL_CFG_USE_HISTORY */
-
-                break;
-            }
-            case MICRORL_ESQ_ANSI_DEL:  /* Backspace */
-            case MICRORL_ESQ_ANSI_BS: { /* ^H */
-                if (mrl->cursor > 0) {
-                    prv_cmdline_buf_backspace(mrl, 1);
-                    if (mrl->cursor == mrl->cmdlen) {
-                        prv_terminal_backspace(mrl);
-                    } else {
-                        prv_terminal_print_line(mrl, mrl->cursor, 1);
-                    }
-                }
-                break;
-            }
-            case MICRORL_ESQ_ANSI_EOT: { /* ^D */
-                prv_cmdline_buf_delete(mrl);
-                prv_terminal_print_line(mrl, mrl->cursor, 0);
-                break;
-            }
-            case MICRORL_ESQ_ANSI_DC2: { /* ^R */
-                prv_terminal_newline(mrl);
-                prv_terminal_print_prompt(mrl);
-                prv_terminal_print_line(mrl, 0, 0);
-                break;
-            }
-            case MICRORL_ESQ_ANSI_ETX: {
-#if MICRORL_CFG_USE_CTRL_C
-                if (mrl->sigint_fn == NULL) {
-                    return microrlERRPAR;
-                }
-                mrl->sigint_fn(mrl);
-#endif /* MICRORL_CFG_USE_CTRL_C */
-                break;
-            }
-            default: {
-                if (((ch == ' ') && (mrl->cmdlen == 0)) || IS_CONTROL_CHAR(ch)) {   /* Skip spaces in first command line symbol or escapes */
-                    break;
-                }
-                if (prv_cmdline_buf_insert_text(mrl, &ch, 1) != microrlOK) {
-                    return microrlERRCLFULL;
-                }
-                if (mrl->cursor == mrl->cmdlen) {
-                    char nch[] = {0, 0};
-                    nch[0] = ch;
-#if MICRORL_CFG_USE_ECHO_OFF
-                    if (((int32_t)mrl->cursor >= mrl->echo_off_pos) && (mrl->echo != MICRORL_ECHO_ON)) {
-                        nch[0] = MICRORL_CFG_ECHO_OFF_MASK;
-                    }
-#endif /* MICRORL_CFG_USE_ECHO_OFF */
-                    mrl->out_fn(mrl, nch);
-                } else {
-                    prv_terminal_print_line(mrl, mrl->cursor - 1, 0);
-                }
-            }
+            res = prv_insert_char(mrl, ch);
+        }
+        if (res != microrlOK) {
+            return res;
         }
     }
-    
+
     return microrlOK;
 }
 
