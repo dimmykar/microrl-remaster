@@ -590,12 +590,12 @@ static uint8_t prv_escape_process(microrl_t* mrl, char ch) {
     if (ch == '[') {
         mrl->esc_code = MICRORL_ESC_BRACKET;
         return 0;
-    } else if (ch == MICRORL_ESQ_ANSI_DEL) {
+    } else if (ch == MICRORL_ESQ_ANSI_DEL) {    /* Alt+BACKSPACE */
         prv_cmdline_buf_delete(mrl);
         prv_terminal_print_line(mrl, mrl->cursor, 0);
         return 1;
     } else if (mrl->esc_code == MICRORL_ESC_BRACKET) {
-        if (ch == 'A') {
+        if (ch == 'A') {                        /* UP */
 #if MICRORL_CFG_USE_HISTORY
 
 #if MICRORL_CFG_USE_ECHO_OFF
@@ -609,7 +609,7 @@ static uint8_t prv_escape_process(microrl_t* mrl, char ch) {
 #endif /* MICRORL_CFG_USE_HISTORY */
 
             return 1;
-        } else if (ch == 'B') {
+        } else if (ch == 'B') {                 /* DOWN */
 #if MICRORL_CFG_USE_HISTORY
 
 #if MICRORL_CFG_USE_ECHO_OFF
@@ -623,13 +623,13 @@ static uint8_t prv_escape_process(microrl_t* mrl, char ch) {
 #endif /* MICRORL_CFG_USE_HISTORY */
 
             return 1;
-        } else if (ch == 'C') {
+        } else if (ch == 'C') {                 /* RIGHT */
             if (mrl->cursor < mrl->cmdlen) {
                 prv_terminal_move_cursor(mrl, 1);
                 ++mrl->cursor;
             }
             return 1;
-        } else if (ch == 'D') {
+        } else if (ch == 'D') {                 /* LEFT */
             if (mrl->cursor > 0) {
                 prv_terminal_move_cursor(mrl, -1);
                 --mrl->cursor;
@@ -646,15 +646,15 @@ static uint8_t prv_escape_process(microrl_t* mrl, char ch) {
             return 0;
         }
     } else if (ch == '~') {
-        if (mrl->esc_code == MICRORL_ESC_HOME) {
+        if (mrl->esc_code == MICRORL_ESC_HOME) {/* HOME */
             prv_terminal_move_cursor(mrl, -mrl->cursor);
             mrl->cursor = 0;
             return 1;
-        } else if (mrl->esc_code == MICRORL_ESC_END) {
+        } else if (mrl->esc_code == MICRORL_ESC_END) {  /* END */
             prv_terminal_move_cursor(mrl, mrl->cmdlen - mrl->cursor);
             mrl->cursor = mrl->cmdlen;
             return 1;
-        } else if (mrl->esc_code == MICRORL_ESC_DEL) {
+        } else if (mrl->esc_code == MICRORL_ESC_DEL) {  /* DELETE */
             prv_cmdline_buf_delete(mrl);
             prv_terminal_print_line(mrl, mrl->cursor, 0);
             return 1;
