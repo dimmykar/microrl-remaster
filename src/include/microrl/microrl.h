@@ -158,8 +158,8 @@ typedef struct microrl {
     microrl_sigint_fn sigint_fn;                /*!< Ctrl+C terminal signal callback */
 #endif /* MICRORL_CFG_USE_CTRL_C || __DOXYGEN__ */
 
-    char* prompt;                               /*!< Pointer to prompt string */
-    char cmdline[MICRORL_CFG_CMDLINE_LEN + 1];  /*!< Command line input buffer with NULL character */
+    char* prompt_ptr;                           /*!< Pointer to prompt string */
+    char cmdline_str[MICRORL_CFG_CMDLINE_LEN + 1];  /*!< Command line input buffer with NULL character */
     size_t cmdlen;                              /*!< Command length in command line buffer */
     size_t cursor;                              /*!< Command line buffer position pointer */
     char last_endl;                             /*!< Either 0 or the CR or LF that just triggered a newline */
@@ -178,25 +178,25 @@ typedef struct microrl {
     int32_t echo_off_pos;                       /*!< Start position to print '*' echo off chars */
 #endif /* MICRORL_CFG_USE_ECHO_OFF || __DOXYGEN__ */
 
-    void* userdata;                             /*!< Generic user data storage */
+    void* userdata_ptr;                         /*!< Generic user data storage */
 } microrl_t;
 
 microrlr_t  microrl_init(microrl_t* mrl, microrl_output_fn out_fn, microrl_exec_fn exec_fn);
 
 microrlr_t  microrl_set_execute_callback(microrl_t* mrl, microrl_exec_fn exec_fn);
 #if MICRORL_CFG_USE_COMPLETE
-microrlr_t  microrl_set_complete_callback(microrl_t* mrl, microrl_get_compl_fn get_completion);
+microrlr_t  microrl_set_complete_callback(microrl_t* mrl, microrl_get_compl_fn get_completion_fn);
 #endif /* MICRORL_CFG_USE_COMPLETE */
 #if MICRORL_CFG_USE_CTRL_C
-microrlr_t  microrl_set_sigint_callback(microrl_t* mrl, microrl_sigint_fn sigint);
+microrlr_t  microrl_set_sigint_callback(microrl_t* mrl, microrl_sigint_fn sigint_fn);
 #endif /* MICRORL_CFG_USE_CTRL_C */
 
-microrlr_t  microrl_set_prompt(microrl_t* mrl, char* prompt);
+microrlr_t  microrl_set_prompt(microrl_t* mrl, char* prompt_str);
 #if MICRORL_CFG_USE_ECHO_OFF || __DOXYGEN__
 microrlr_t  microrl_set_echo(microrl_t* mrl, microrl_echo_t echo);
 #endif /* #if MICRORL_CFG_USE_ECHO_OFF */
 
-microrlr_t  microrl_processing_input(microrl_t* mrl, const void* in_data, size_t len);
+microrlr_t  microrl_processing_input(microrl_t* mrl, const void* data_ptr, size_t len);
 
 uint32_t    microrl_get_version(void);
 

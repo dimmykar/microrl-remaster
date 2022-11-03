@@ -119,26 +119,26 @@ typedef enum {
 /**
  * \brief           Split command line to tokens array
  * \param[in]       mrl: \ref microrl_t working instance
- * \param[out]      tkn_arr: Tokens buffer stored split words
- * \param[out]      tkn_count: Number of split tokens
+ * \param[out]      tkn_str_arr: Tokens buffer stored split words
+ * \param[out]      tkn_cnt_ptr: Number of split tokens
  * \param[in]       limit: Number of command line characters to split
  * \return          \ref microrlOK on success, member of \ref microrlr_t enumeration otherwise
  */
-static microrlr_t prv_cmdline_buf_split(microrl_t* mrl, const char** tkn_arr, uint8_t* tkn_count, size_t limit) {
+static microrlr_t prv_cmdline_buf_split(microrl_t* mrl, const char** tkn_str_arr, uint8_t* tkn_cnt_ptr, size_t limit) {
     uint8_t num = 0;
-    char *str = mrl->cmdline;
+    char *str = mrl->cmdline_str;
 
     /* Process complete string */
     while (*str != '\0') {
 #if MICRORL_CFG_USE_QUOTING
         if (*str == '"' || *str == '\'') {      /* Check if it starts with quote to handle escapes */
             ++str;
-            tkn_arr[num++] = str;               /* Set start of argument after quotes */
+            tkn_str_arr[num++] = str;               /* Set start of argument after quotes */
 
             while (*str != '\0') {              /* Process until end of quote */
-                if (!((size_t)(str - mrl->cmdline) < limit)) {
-                    tkn_arr[--num] = NULL;
-                    *tkn_count = num;
+                if (!((size_t)(str - mrl->cmdline_str) < limit)) {
+                    tkn_str_arr[--num] = NULL;
+                    *tkn_cnt_ptr = num;
                     return microrlOK;
                 }
 
@@ -157,11 +157,11 @@ static microrlr_t prv_cmdline_buf_split(microrl_t* mrl, const char** tkn_arr, ui
             }
         } else {
 #endif /* MICRORL_CFG_USE_QUOTING */
-            tkn_arr[num++] = str;               /* Set start of argument directly on character */
+            tkn_str_arr[num++] = str;               /* Set start of argument directly on character */
             while ((*str != ' ' && *str != '\0')) {
-                if (!((size_t)(str - mrl->cmdline) < limit)) {
-                    tkn_arr[--num] = NULL;
-                    *tkn_count = num;
+                if (!((size_t)(str - mrl->cmdline_str) < limit)) {
+                    tkn_str_arr[--num] = NULL;
+                    *tkn_cnt_ptr = num;
                     return microrlOK;
                 }
 #if MICRORL_CFG_USE_QUOTING
@@ -184,19 +184,19 @@ static microrlr_t prv_cmdline_buf_split(microrl_t* mrl, const char** tkn_arr, ui
         }
     }
 
-    *tkn_count = num;
+    *tkn_cnt_ptr = num;
     return microrlOK;
 }
 
 /**
  * \brief           Insert the passed text at the cursor position
  * \param[in,out]   mrl: \ref microrl_t working instance
- * \param[in]       text: Text to store on the command line
+ * \param[in]       text_str: Text to store on the command line
  * \param[in]       len: Length of text to store
  * \return          \ref microrlOK on success, member of \ref microrlr_t enumeration otherwise
  */
-static microrlr_t prv_cmdline_buf_insert_text(microrl_t* mrl, const char* text, size_t len) {
-    if ((mrl->cmdlen + len) > (MICRORL_ARRAYSIZE(mrl->cmdline) - 1)) {
+static microrlr_t prv_cmdline_buf_insert_text(microrl_t* mrl, const char* text_str, size_t len) {
+    if ((mrl->cmdlen + len) > (MICRORL_ARRAYSIZE(mrl->cmdline_str) - 1)) {
         return microrlERRCLFULL;
     }
 
@@ -205,15 +205,15 @@ static microrlr_t prv_cmdline_buf_insert_text(microrl_t* mrl, const char* text, 
         mrl->echo_off_pos = mrl->cmdlen;
     }
 #endif /* MICRORL_CFG_USE_ECHO_OFF */
-    memmove(mrl->cmdline + mrl->cursor + len,
-            mrl->cmdline + mrl->cursor,
+    memmove(mrl->cmdline_str + mrl->cursor + len,
+            mrl->cmdline_str + mrl->cursor,
             mrl->cmdlen - mrl->cursor);
     for (size_t i = 0; i < len; ++i) {
-        mrl->cmdline[mrl->cursor + i] = text[i];
+        mrl->cmdline_str[mrl->cursor + i] = text_str[i];
     }
     mrl->cursor += len;
     mrl->cmdlen += len;
-    memset(&mrl->cmdline[mrl->cmdlen], 0x00, MICRORL_ARRAYSIZE(mrl->cmdline) - 1 - mrl->cmdlen);
+    memset(&mrl->cmdline_str[mrl->cmdlen], 0x00, MICRORL_ARRAYSIZE(mrl->cmdline_str) - 1 - mrl->cmdlen);
 
     return microrlOK;
 }
@@ -228,11 +228,11 @@ static void prv_cmdline_buf_backspace(microrl_t* mrl, size_t len) {
         return;
     }
 
-    memmove(mrl->cmdline + mrl->cursor - len,
-            mrl->cmdline + mrl->cursor,
+    memmove(mrl->cmdline_str + mrl->cursor - len,
+            mrl->cmdline_str + mrl->cursor,
             mrl->cmdlen - mrl->cursor + len);
     mrl->cursor -= len;
-    mrl->cmdline[mrl->cmdlen] = '\0';
+    mrl->cmdline_str[mrl->cmdlen] = '\0';
     mrl->cmdlen -= len;
 }
 
@@ -245,10 +245,10 @@ static void prv_cmdline_buf_delete(microrl_t* mrl) {
         return;
     }
 
-    memmove(mrl->cmdline + mrl->cursor,
-            mrl->cmdline + mrl->cursor + 1,
+    memmove(mrl->cmdline_str + mrl->cursor,
+            mrl->cmdline_str + mrl->cursor + 1,
             mrl->cmdlen - mrl->cursor + 1);
-    mrl->cmdline[mrl->cmdlen] = '\0';
+    mrl->cmdline_str[mrl->cmdlen] = '\0';
     --mrl->cmdlen;
 }
 
@@ -257,7 +257,7 @@ static void prv_cmdline_buf_delete(microrl_t* mrl) {
  * \param[out]      mrl: \ref microrl_t working instance
  */
 static __INLINE__ void prv_cmdline_buf_reset(microrl_t* mrl) {
-    memset(mrl->cmdline, 0x00, sizeof(mrl->cmdline));
+    memset(mrl->cmdline_str, 0x00, sizeof(mrl->cmdline_str));
     mrl->cmdlen = 0;
     mrl->cursor = 0;
 }
@@ -268,7 +268,7 @@ static __INLINE__ void prv_cmdline_buf_reset(microrl_t* mrl) {
  */
 static __INLINE__ void prv_terminal_print_prompt(microrl_t* mrl) {
     mrl->out_fn(mrl, MICRORL_CFG_PROMPT_COLOR);
-    mrl->out_fn(mrl, mrl->prompt);
+    mrl->out_fn(mrl, mrl->prompt_ptr);
     mrl->out_fn(mrl, MICRORL_COLOR_DEFAULT);
 }
 
@@ -364,46 +364,46 @@ static void prv_terminal_move_cursor(microrl_t* mrl, int32_t offset) {
  */
 static void prv_terminal_print_line(microrl_t* mrl, int32_t pos, uint8_t reset) {
     char str[MICRORL_CFG_PRINT_BUFFER_LEN] = {0};
-    char* j = str;
+    char* str_ptr = str;
 
     if (reset) {
 #if MICRORL_CFG_USE_CARRIAGE_RETURN
-        *j++ = '\r';
-        j = prv_cursor_generate_move(j, strlen(mrl->prompt) + pos);
+        *str_ptr++ = '\r';
+        str_ptr = prv_cursor_generate_move(str_ptr, strlen(mrl->prompt_ptr) + pos);
 #else
-        j = prv_cursor_generate_move(j, -(MICRORL_ARRAYSIZE(mrl->cmdline) - 1 + strlen(mrl->prompt) + 2));
-        j = prv_cursor_generate_move(j, strlen(mrl->prompt) + pos);
+        str_ptr = prv_cursor_generate_move(str_ptr, -(MICRORL_ARRAYSIZE(mrl->cmdline_str) - 1 + strlen(mrl->prompt_ptr) + 2));
+        str_ptr = prv_cursor_generate_move(str_ptr, strlen(mrl->prompt_ptr) + pos);
 #endif /* MICRORL_CFG_USE_CARRIAGE_RETURN */
     }
 
     for (size_t i = pos; i < mrl->cmdlen; ++i) {
-        *j = mrl->cmdline[i];
+        *str_ptr = mrl->cmdline_str[i];
 
 #if MICRORL_CFG_USE_ECHO_OFF
         if (((int32_t)i >= mrl->echo_off_pos) && (mrl->echo != MICRORL_ECHO_ON)) {
-            *j = MICRORL_CFG_ECHO_OFF_MASK;
+            *str_ptr = MICRORL_CFG_ECHO_OFF_MASK;
         }
 #endif /* MICRORL_CFG_USE_ECHO_OFF */
 
-        ++j;
+        ++str_ptr;
 
-        if ((size_t)(j - str) == strlen(str)) {
-            *j = '\0';
+        if ((size_t)(str_ptr - str) == strlen(str)) {
+            *str_ptr = '\0';
             mrl->out_fn(mrl, str);
-            j = str;
+            str_ptr = str;
         }
     }
 
-    if ((size_t)(j - str + 3 + 6 + 1) > MICRORL_ARRAYSIZE(str)) {
-        *j = '\0';
+    if ((size_t)(str_ptr - str + 3 + 6 + 1) > MICRORL_ARRAYSIZE(str)) {
+        *str_ptr = '\0';
         mrl->out_fn(mrl, str);
-        j = str;
+        str_ptr = str;
     }
 
-    *j++ = '\033';                              /* Delete all past end of text */
-    *j++ = '[';
-    *j++ = 'K';
-    prv_cursor_generate_move(j, mrl->cursor - mrl->cmdlen);
+    *str_ptr++ = '\033';                              /* Delete all past end of text */
+    *str_ptr++ = '[';
+    *str_ptr++ = 'K';
+    prv_cursor_generate_move(str_ptr, mrl->cursor - mrl->cmdlen);
     mrl->out_fn(mrl, str);
 }
 
@@ -411,51 +411,51 @@ static void prv_terminal_print_line(microrl_t* mrl, int32_t pos, uint8_t reset) 
 
 /**
  * \brief           Set the next record start position to the passed index
- * \param[in]       prbuf: Pointer to \ref microrl_hist_rbuf_t structure
- * \param[in,out]   index: Pointer to the current record
+ * \param[in]       rbuf_ptr: Pointer to \ref microrl_hist_rbuf_t structure
+ * \param[in,out]   idx_ptr: Pointer to the current record
  */
-static __INLINE__ void prv_hist_next_record(microrl_hist_rbuf_t* prbuf, size_t* index) {
-    while (prbuf->ring_buf[*index] != '\0') {
-        ++(*index);
-        if (*index >= MICRORL_ARRAYSIZE(prbuf->ring_buf)) {
-            *index -= MICRORL_ARRAYSIZE(prbuf->ring_buf);
+static __INLINE__ void prv_hist_next_record(microrl_hist_rbuf_t* rbuf_ptr, size_t* idx_ptr) {
+    while (rbuf_ptr->ring_buf[*idx_ptr] != '\0') {
+        ++(*idx_ptr);
+        if (*idx_ptr >= MICRORL_ARRAYSIZE(rbuf_ptr->ring_buf)) {
+            *idx_ptr -= MICRORL_ARRAYSIZE(rbuf_ptr->ring_buf);
         }
     }
-    ++(*index);
+    ++(*idx_ptr);
 }
 
 /**
  * \brief           Remove older record from ring buffer
- * \param[in,out]   prbuf: Pointer to \ref microrl_hist_rbuf_t structure
+ * \param[in,out]   rbuf_ptr: Pointer to \ref microrl_hist_rbuf_t structure
  */
-static void prv_hist_erase_older(microrl_hist_rbuf_t* prbuf) {
-    size_t new_pos = prbuf->head;
-    prv_hist_next_record(prbuf, &new_pos);
-    prbuf->head = new_pos;
+static void prv_hist_erase_older(microrl_hist_rbuf_t* rbuf_ptr) {
+    size_t new_pos = rbuf_ptr->head;
+    prv_hist_next_record(rbuf_ptr, &new_pos);
+    rbuf_ptr->head = new_pos;
 
     /*
      * If after record erasing the head has moved further than the tail,
      * then the history is empty, so it is needed to reset the tail
      */
-    if (prbuf->head == prbuf->tail + 1) {
-        prbuf->tail = prbuf->head;
-        prbuf->ring_buf[prbuf->tail] = '\0';
+    if (rbuf_ptr->head == rbuf_ptr->tail + 1) {
+        rbuf_ptr->tail = rbuf_ptr->head;
+        rbuf_ptr->ring_buf[rbuf_ptr->tail] = '\0';
     }
 }
 
 /**
  * \brief           Check space in history buffer for new record
- * \param[in]       prbuf: Pointer to \ref microrl_hist_rbuf_t structure
+ * \param[in]       rbuf_ptr: Pointer to \ref microrl_hist_rbuf_t structure
  * \param[in]       len: Length of new record to save in history
  * \return          Member of \ref microrl_hist_status_t enumeration
  */
-static microrl_hist_status_t prv_hist_is_space_for_new(microrl_hist_rbuf_t* prbuf, size_t len) {
-    if (prbuf->tail >= prbuf->head) {
-        if ((MICRORL_ARRAYSIZE(prbuf->ring_buf) - prbuf->tail + prbuf->head - 1) > len) {
+static microrl_hist_status_t prv_hist_is_space_for_new(microrl_hist_rbuf_t* rbuf_ptr, size_t len) {
+    if (rbuf_ptr->tail >= rbuf_ptr->head) {
+        if ((MICRORL_ARRAYSIZE(rbuf_ptr->ring_buf) - rbuf_ptr->tail + rbuf_ptr->head - 1) > len) {
             return MICRORL_HIST_NOT_FULL;
         }
     } else {
-        if ((prbuf->head - prbuf->tail - 1) > len) {
+        if ((rbuf_ptr->head - rbuf_ptr->tail - 1) > len) {
             return MICRORL_HIST_NOT_FULL;
         }
     }
@@ -465,58 +465,58 @@ static microrl_hist_status_t prv_hist_is_space_for_new(microrl_hist_rbuf_t* prbu
 
 /**
  * \brief           Copy saved record to 'line' and return size of record
- * \param[in]       prbuf: Pointer to \ref microrl_hist_rbuf_t structure
- * \param[out]      line: Line to restore from history
+ * \param[in]       rbuf_ptr: Pointer to \ref microrl_hist_rbuf_t structure
+ * \param[out]      line_str: Line to restore from history
  * \param[in]       dir: Record search direction, member of \ref microrl_hist_dir_t
  * \return          Size of restored line. `0` is returned, if history is empty
  */
-static size_t prv_hist_restore_line(microrl_hist_rbuf_t* prbuf, char* line, microrl_hist_dir_t dir) {
+static size_t prv_hist_restore_line(microrl_hist_rbuf_t* rbuf_ptr, char* line_str, microrl_hist_dir_t dir) {
     size_t cnt = 0;
-    size_t i = prbuf->head;
-    while (i - 1 != prbuf->tail) {              /* Count history records */
-        prv_hist_next_record(prbuf, &i);
+    size_t i = rbuf_ptr->head;
+    while (i - 1 != rbuf_ptr->tail) {              /* Count history records */
+        prv_hist_next_record(rbuf_ptr, &i);
         ++cnt;
     }
 
-    size_t ind = prbuf->head;
+    size_t idx = rbuf_ptr->head;
     size_t j = 0;
     if (dir == MICRORL_HIST_DIR_UP) {           /* Set navigation counter depending on the direction */
-        if (cnt < prbuf->count) {
+        if (cnt < rbuf_ptr->count) {
             return 0;                           /* Impossible state, return empty line */
         }
-        if (cnt != prbuf->count) {
-            ++prbuf->count;
+        if (cnt != rbuf_ptr->count) {
+            ++rbuf_ptr->count;
         }
     } else if (dir == MICRORL_HIST_DIR_DOWN) {
-        if (prbuf->count == 0) {
+        if (rbuf_ptr->count == 0) {
             return 0;                           /* Empty line */
         }
-        if (--prbuf->count == 0) {
+        if (--rbuf_ptr->count == 0) {
             return 0;                           /* Empty line */
         }
     }
 
-    while ((cnt - j++) != prbuf->count) {       /* Find record for 'prbuf->count' counter */
-        prv_hist_next_record(prbuf, &ind);
+    while ((cnt - j++) != rbuf_ptr->count) {       /* Find record for 'rbuf_ptr->count' counter */
+        prv_hist_next_record(rbuf_ptr, &idx);
     }
 
     size_t rec_len = 0;
-    size_t k = ind;
-    while (prbuf->ring_buf[k] != '\0') {        /* Calculating the length of the found record */
+    size_t k = idx;
+    while (rbuf_ptr->ring_buf[k] != '\0') {        /* Calculating the length of the found record */
         ++k;
-        if (k >= MICRORL_ARRAYSIZE(prbuf->ring_buf)) {
-            k -= MICRORL_ARRAYSIZE(prbuf->ring_buf);
+        if (k >= MICRORL_ARRAYSIZE(rbuf_ptr->ring_buf)) {
+            k -= MICRORL_ARRAYSIZE(rbuf_ptr->ring_buf);
         }
         ++rec_len;
     }
 
-    memset(line, 0x00, MICRORL_CFG_CMDLINE_LEN);    /* Placing the found record on the command line */
-    if ((ind + rec_len) < MICRORL_ARRAYSIZE(prbuf->ring_buf)) {
-        memcpy(line, prbuf->ring_buf + ind, rec_len);
+    memset(line_str, 0x00, MICRORL_CFG_CMDLINE_LEN);    /* Placing the found record on the command line */
+    if ((idx + rec_len) < MICRORL_ARRAYSIZE(rbuf_ptr->ring_buf)) {
+        memcpy(line_str, rbuf_ptr->ring_buf + idx, rec_len);
     } else {
-        size_t part0 = MICRORL_ARRAYSIZE(prbuf->ring_buf) - ind;
-        memcpy(line, prbuf->ring_buf + ind, part0);
-        memcpy(line + part0, prbuf->ring_buf, rec_len - part0);
+        size_t part0 = MICRORL_ARRAYSIZE(rbuf_ptr->ring_buf) - idx;
+        memcpy(line_str, rbuf_ptr->ring_buf + idx, part0);
+        memcpy(line_str + part0, rbuf_ptr->ring_buf, rec_len - part0);
     }
 
     return rec_len;
@@ -528,53 +528,53 @@ static size_t prv_hist_restore_line(microrl_hist_rbuf_t* prbuf, char* line, micr
  * \param[in]       dir: Member of \ref microrl_hist_dir_t enumeration
  */
 static void prv_hist_search(microrl_t* mrl, microrl_hist_dir_t dir) {
-    size_t len = prv_hist_restore_line(&mrl->ring_hist, mrl->cmdline, dir);
-    memset(&mrl->cmdline[len], 0x00, MICRORL_ARRAYSIZE(mrl->cmdline) - 1 - len);
+    size_t len = prv_hist_restore_line(&mrl->ring_hist, mrl->cmdline_str, dir);
+    memset(&mrl->cmdline_str[len], 0x00, MICRORL_ARRAYSIZE(mrl->cmdline_str) - 1 - len);
     mrl->cursor = mrl->cmdlen = len;
     prv_terminal_print_line(mrl, 0, 1);
 }
 
 /**
  * \brief           Put record to ring buffer
- * \param[in,out]   prbuf: Pointer to \ref microrl_hist_rbuf_t structure
- * \param[in]       line: Record to save in history
+ * \param[in,out]   rbuf_ptr: Pointer to \ref microrl_hist_rbuf_t structure
+ * \param[in]       line_str: Record to save in history
  * \param[in]       len: Record length
  */
-static void prv_hist_save_line(microrl_hist_rbuf_t* prbuf, char* line, size_t len) {
-    if (len > (MICRORL_ARRAYSIZE(prbuf->ring_buf) - 1)) {
+static void prv_hist_save_line(microrl_hist_rbuf_t* rbuf_ptr, char* line_str, size_t len) {
+    if (len > (MICRORL_ARRAYSIZE(rbuf_ptr->ring_buf) - 1)) {
         return;
     }
 
     /* Don't save the same line as the last record */
-    char last_record[MICRORL_CFG_CMDLINE_LEN + 1];
-    prv_hist_restore_line(prbuf, last_record,
-                              prbuf->count == 1 ? MICRORL_HIST_DIR_NONE : MICRORL_HIST_DIR_UP);
-    if (strcmp(line, last_record) == 0) {
-        prbuf->count = 0;
+    char last_record_str[MICRORL_CFG_CMDLINE_LEN + 1];
+    prv_hist_restore_line(rbuf_ptr, last_record_str,
+                              rbuf_ptr->count == 1 ? MICRORL_HIST_DIR_NONE : MICRORL_HIST_DIR_UP);
+    if (strcmp(line_str, last_record_str) == 0) {
+        rbuf_ptr->count = 0;
         return;
     }
 
-    while (prv_hist_is_space_for_new(prbuf, len) == MICRORL_HIST_FULL) {    /* Freeing up space for saving in the ring buffer */
-        prv_hist_erase_older(prbuf);
+    while (prv_hist_is_space_for_new(rbuf_ptr, len) == MICRORL_HIST_FULL) {    /* Freeing up space for saving in the ring buffer */
+        prv_hist_erase_older(rbuf_ptr);
     }
 
-    if (len < (MICRORL_ARRAYSIZE(prbuf->ring_buf) - prbuf->tail - 1)) {     /* Store record */
-        memcpy(prbuf->ring_buf + prbuf->tail + 1, line, len);
+    if (len < (MICRORL_ARRAYSIZE(rbuf_ptr->ring_buf) - rbuf_ptr->tail - 1)) {     /* Store record */
+        memcpy(rbuf_ptr->ring_buf + rbuf_ptr->tail + 1, line_str, len);
     } else {
-        size_t part_len = MICRORL_ARRAYSIZE(prbuf->ring_buf) - prbuf->tail - 1;
-        memcpy(prbuf->ring_buf + prbuf->tail + 1, line, part_len);
-        memcpy(prbuf->ring_buf, line + part_len, len - part_len);
+        size_t part_len = MICRORL_ARRAYSIZE(rbuf_ptr->ring_buf) - rbuf_ptr->tail - 1;
+        memcpy(rbuf_ptr->ring_buf + rbuf_ptr->tail + 1, line_str, part_len);
+        memcpy(rbuf_ptr->ring_buf, line_str + part_len, len - part_len);
     }
 
-    if (prbuf->head == prbuf->tail) {           /* Update position pointer and navigation counter */
-        ++prbuf->head;
+    if (rbuf_ptr->head == rbuf_ptr->tail) {           /* Update position pointer and navigation counter */
+        ++rbuf_ptr->head;
     }
-    prbuf->tail = prbuf->tail + len + 1;
-    if (prbuf->tail >= MICRORL_ARRAYSIZE(prbuf->ring_buf)) {
-        prbuf->tail -= MICRORL_ARRAYSIZE(prbuf->ring_buf);
+    rbuf_ptr->tail = rbuf_ptr->tail + len + 1;
+    if (rbuf_ptr->tail >= MICRORL_ARRAYSIZE(rbuf_ptr->ring_buf)) {
+        rbuf_ptr->tail -= MICRORL_ARRAYSIZE(rbuf_ptr->ring_buf);
     }
-    prbuf->ring_buf[prbuf->tail] = 0;
-    prbuf->count = 0;
+    rbuf_ptr->ring_buf[rbuf_ptr->tail] = 0;
+    rbuf_ptr->count = 0;
 }
 
 #endif /* MICRORL_CFG_USE_HISTORY || __DOXYGEN__ */
@@ -671,8 +671,8 @@ static uint8_t prv_escape_process(microrl_t* mrl, char ch) {
  * \return          \ref microrlOK on success, member of \ref microrlr_t enumeration otherwise
  */
 static microrlr_t prv_handle_newline(microrl_t* mrl) {
-    const char* tkn_arr[MICRORL_CFG_CMD_TOKEN_NMB] = {0};
-    uint8_t tkn_count = 0;
+    const char* tkn_str_arr[MICRORL_CFG_CMD_TOKEN_NMB] = {0};
+    uint8_t tkn_cnt = 0;
     microrlr_t status = microrlOK;
 
     prv_terminal_newline(mrl);
@@ -685,31 +685,31 @@ static microrlr_t prv_handle_newline(microrl_t* mrl) {
 #if MICRORL_CFG_USE_ECHO_OFF
     if (mrl->echo == MICRORL_ECHO_ON) {
 #endif /* MICRORL_CFG_USE_ECHO_OFF */
-        prv_hist_save_line(&mrl->ring_hist, mrl->cmdline, mrl->cmdlen);
+        prv_hist_save_line(&mrl->ring_hist, mrl->cmdline_str, mrl->cmdlen);
 #if MICRORL_CFG_USE_ECHO_OFF
     }
 #endif /* MICRORL_CFG_USE_ECHO_OFF */
 #endif /* MICRORL_CFG_USE_HISTORY */
 
 #if MICRORL_CFG_USE_ECHO_OFF
-    if (mrl->echo == MICRORL_ECHO_ONCE && mrl->cmdline[mrl->echo_off_pos] != '\0') {
+    if (mrl->echo == MICRORL_ECHO_ONCE && mrl->cmdline_str[mrl->echo_off_pos] != '\0') {
         microrl_set_echo(mrl, MICRORL_ECHO_ON);
         mrl->echo_off_pos = -1;
     }
 #endif /* MICRORL_CFG_USE_ECHO_OFF */
 
-    status = prv_cmdline_buf_split(mrl, tkn_arr, &tkn_count, mrl->cmdlen);
+    status = prv_cmdline_buf_split(mrl, tkn_str_arr, &tkn_cnt, mrl->cmdlen);
     if (status == microrlOK) {
 #if MICRORL_CFG_USE_COMMAND_HOOKS
         int exec_status = 0;
 
-        MICRORL_PRE_COMMAND_HOOK(mrl, tkn_count, tkn_arr);
+        MICRORL_PRE_COMMAND_HOOK(mrl, tkn_cnt, tkn_str_arr);
 
-        exec_status = mrl->exec_fn(mrl, tkn_count, tkn_arr);
+        exec_status = mrl->exec_fn(mrl, tkn_cnt, tkn_str_arr);
 
-        MICRORL_POST_COMMAND_HOOK(mrl, exec_status, tkn_count, tkn_arr);
+        MICRORL_POST_COMMAND_HOOK(mrl, exec_status, tkn_cnt, tkn_str_arr);
 #else
-        mrl->exec_fn(mrl, tkn_count, tkn_arr);
+        mrl->exec_fn(mrl, tkn_cnt, tkn_str_arr);
 #endif /* MICRORL_CFG_USE_COMMAND_HOOKS */
     } else {
         mrl->out_fn(mrl, "ERROR: too many tokens");
@@ -732,19 +732,19 @@ exit:
  */
 static size_t prv_complite_total_len(const char* const * argv) {
     size_t i;
-    const char* shortest = (const char*)argv[0];
-    size_t shortlen = strlen(shortest);
+    const char* short_str = (const char*)argv[0];
+    size_t shortlen = strlen(short_str);
 
     for (i = 0; argv[i] != NULL; ++i) {
         if (strlen(argv[i]) < shortlen) {
-            shortest = argv[i];
-            shortlen = strlen(shortest);
+            short_str = argv[i];
+            shortlen = strlen(short_str);
         }
     }
 
     for (i = 0; i < shortlen; ++i) {
         for (size_t j = 0; argv[j] != NULL; ++j) {
-            if (shortest[i] != argv[j][i]) {
+            if (short_str[i] != argv[j][i]) {
                 return i;
             }
         }
@@ -765,22 +765,22 @@ static microrlr_t prv_complite_get_input(microrl_t* mrl) {
         return microrlOK;
     }
 
-    uint8_t tkn_count = 0;
-    const char* tkn_arr[MICRORL_CFG_CMD_TOKEN_NMB] = {0};
-    char** compl_token;
+    uint8_t tkn_cnt = 0;
+    const char* tkn_str_arr[MICRORL_CFG_CMD_TOKEN_NMB] = {0};
+    char** cmplt_tkn_arr;
 
-    if (prv_cmdline_buf_split(mrl, tkn_arr, &tkn_count, mrl->cursor) != microrlOK) {
+    if (prv_cmdline_buf_split(mrl, tkn_str_arr, &tkn_cnt, mrl->cursor) != microrlOK) {
         return microrlERRCPLT;
     }
 
-    if (mrl->cmdline[mrl->cursor - 1] == '\0') {
+    if (mrl->cmdline_str[mrl->cursor - 1] == '\0') {
         /* Last char is whitespace */
-        tkn_arr[tkn_count++] = "";
-        tkn_arr[tkn_count] = NULL;
+        tkn_str_arr[tkn_cnt++] = "";
+        tkn_str_arr[tkn_cnt] = NULL;
     }
 
-    compl_token = mrl->get_completion_fn(mrl, tkn_count, tkn_arr);
-    if (compl_token[0] == NULL) {
+    cmplt_tkn_arr = mrl->get_completion_fn(mrl, tkn_cnt, tkn_str_arr);
+    if (cmplt_tkn_arr[0] == NULL) {
         return microrlERRCPLT;
     }
 
@@ -788,13 +788,13 @@ static microrlr_t prv_complite_get_input(microrl_t* mrl) {
     size_t len;
     size_t pos = mrl->cursor;
 
-    if (compl_token[1] == NULL) {
-        len = strlen(compl_token[0]);
+    if (cmplt_tkn_arr[1] == NULL) {
+        len = strlen(cmplt_tkn_arr[0]);
     } else {
-        len = prv_complite_total_len((const char* const *)compl_token);
+        len = prv_complite_total_len((const char* const *)cmplt_tkn_arr);
         prv_terminal_newline(mrl);
-        while (compl_token[i] != NULL) {
-            mrl->out_fn(mrl, compl_token[i]);
+        while (cmplt_tkn_arr[i] != NULL) {
+            mrl->out_fn(mrl, cmplt_tkn_arr[i]);
             mrl->out_fn(mrl, " ");
             ++i;
         }
@@ -804,19 +804,19 @@ static microrlr_t prv_complite_get_input(microrl_t* mrl) {
     }
 
     if (len != 0) {
-        prv_cmdline_buf_insert_text(mrl, compl_token[0] + strlen(tkn_arr[tkn_count - 1]),
-                                    len - strlen(tkn_arr[tkn_count - 1]));
+        prv_cmdline_buf_insert_text(mrl, cmplt_tkn_arr[0] + strlen(tkn_str_arr[tkn_cnt - 1]),
+                                    len - strlen(tkn_str_arr[tkn_cnt - 1]));
     }
 
     /* Insert end space if completion is performed */
-    if (compl_token[1] == NULL) {
+    if (cmplt_tkn_arr[1] == NULL) {
         prv_cmdline_buf_insert_text(mrl, " ", 1);
     }
 
     /* Restore whitespaces replaced with '0' when command line buffer was split */
-    if (tkn_count != 0) {
-        for (size_t i = 0; i < (size_t)(tkn_count - 1); ++i) {
-            memset((char*)tkn_arr[i] + strlen(tkn_arr[i]), ' ', 1);
+    if (tkn_cnt != 0) {
+        for (size_t i = 0; i < (size_t)(tkn_cnt - 1); ++i) {
+            memset((char*)tkn_str_arr[i] + strlen(tkn_str_arr[i]), ' ', 1);
         }
     }
 
@@ -842,7 +842,7 @@ microrlr_t microrl_init(microrl_t* mrl, microrl_output_fn out_fn, microrl_exec_f
     memset(mrl, 0x00, sizeof(microrl_t));
     mrl->out_fn = out_fn;
     mrl->exec_fn = exec_fn;
-    mrl->prompt = MICRORL_CFG_PROMPT_STRING;
+    mrl->prompt_ptr = MICRORL_CFG_PROMPT_STRING;
 
 #if MICRORL_CFG_PROMPT_ON_INIT
     prv_terminal_print_prompt(mrl);
@@ -876,15 +876,15 @@ microrlr_t microrl_set_execute_callback(microrl_t* mrl, microrl_exec_fn exec_fn)
 /**
  * \brief           Set pointer to input complition callback, that called when user press 'Tab'
  * \param[in,out]   mrl: \ref microrl_t working instance
- * \param[in]       get_completion: Auto-complete input string callback
+ * \param[in]       get_completion_fn: Auto-complete input string callback
  * \return          \ref microrlOK on success, member of \ref microrlr_t enumeration otherwise
  */
-microrlr_t microrl_set_complete_callback(microrl_t* mrl, microrl_get_compl_fn get_completion) {
-    if (mrl == NULL || get_completion == NULL) {
+microrlr_t microrl_set_complete_callback(microrl_t* mrl, microrl_get_compl_fn get_completion_fn) {
+    if (mrl == NULL || get_completion_fn == NULL) {
         return microrlERRPAR;
     }
 
-    mrl->get_completion_fn = get_completion;
+    mrl->get_completion_fn = get_completion_fn;
 
     return microrlOK;
 }
@@ -894,15 +894,15 @@ microrlr_t microrl_set_complete_callback(microrl_t* mrl, microrl_get_compl_fn ge
 /**
  * \brief           Set callback for Ctrl+C terminal signal
  * \param[in,out]   mrl: \ref microrl_t working instance
- * \param[in]       sigint: Ctrl+C terminal signal callback
+ * \param[in]       sigint_fn: Ctrl+C terminal signal callback
  * \return          \ref microrlOK on success, member of \ref microrlr_t enumeration otherwise
  */
-microrlr_t microrl_set_sigint_callback(microrl_t* mrl, microrl_sigint_fn sigint) {
-    if (mrl == NULL || sigint == NULL) {
+microrlr_t microrl_set_sigint_callback(microrl_t* mrl, microrl_sigint_fn sigint_fn) {
+    if (mrl == NULL || sigint_fn == NULL) {
         return microrlERRPAR;
     }
 
-    mrl->sigint_fn = sigint;
+    mrl->sigint_fn = sigint_fn;
 
     return microrlOK;
 }
@@ -911,15 +911,15 @@ microrlr_t microrl_set_sigint_callback(microrl_t* mrl, microrl_sigint_fn sigint)
 /**
  * \brief           Set prompt string
  * \param[in,out]   mrl: \ref microrl_t working instance
- * \param[in]       prompt: pointer to prompt string to set
+ * \param[in]       prompt_str: Pointer to prompt string to set
  * \return          \ref microrlOK on success, member of \ref microrlr_t enumeration otherwise
  */
-microrlr_t  microrl_set_prompt(microrl_t* mrl, char* prompt) {
-    if (mrl == NULL || prompt == NULL) {
+microrlr_t  microrl_set_prompt(microrl_t* mrl, char* prompt_str) {
+    if (mrl == NULL || prompt_str == NULL) {
         return microrlERRPAR;
     }
 
-    mrl->prompt = prompt;
+    mrl->prompt_ptr = prompt_str;
     
     return microrlOK;
 }
@@ -953,7 +953,7 @@ microrlr_t microrl_set_echo(microrl_t* mrl, microrl_echo_t echo) {
  * \return          \ref microrlOK on success, member of \ref microrlr_t enumeration otherwise
  */
 static microrlr_t prv_process_control_char(microrl_t* mrl, char ch) {
-    switch(ch) {
+    switch (ch) {
         case MICRORL_ESC_ANSI_HT: {
 #if MICRORL_CFG_USE_COMPLETE
             if (mrl->get_completion_fn == NULL) {
@@ -1102,19 +1102,19 @@ static microrlr_t prv_insert_char(microrl_t* mrl, char ch) {
 /**
  * \brief           Processing command line input
  * \param[in]       mrl: \ref microrl_t working instance
- * \param[in]       in_data: Input data to process
+ * \param[in]       data_ptr: Input data to process
  * \param[in]       len: Length of data for input
  * \return          \ref microrlOK on success, member of \ref microrlr_t enumeration otherwise
  */
-microrlr_t microrl_processing_input(microrl_t* mrl, const void* in_data, size_t len) {
-    if (mrl == NULL || in_data == NULL || len == 0) {
+microrlr_t microrl_processing_input(microrl_t* mrl, const void* data_ptr, size_t len) {
+    if (mrl == NULL || data_ptr == NULL || len == 0) {
         return microrlERRPAR;
     }
 
-    char* in = (char*)in_data;
+    char* buf_ptr = (char*)data_ptr;
 
     while (len-- != 0) {
-        char ch = *in++;
+        char ch = *buf_ptr++;
 
 #if MICRORL_CFG_USE_ESC_SEQ
         if (mrl->escape) {
