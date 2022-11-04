@@ -936,7 +936,7 @@ microrlr_t microrl_set_echo(microrl_t* mrl, microrl_echo_t echo) {
  * \param[in]       ch: Input char to process
  * \return          \ref microrlOK on success, member of \ref microrlr_t enumeration otherwise
  */
-static microrlr_t prv_process_control_char(microrl_t* mrl, char ch) {
+static microrlr_t prv_control_char_process(microrl_t* mrl, char ch) {
     switch (ch) {
         case MICRORL_ESC_ANSI_HT: {
 #if MICRORL_CFG_USE_COMPLETE
@@ -1113,7 +1113,7 @@ microrlr_t microrl_processing_input(microrl_t* mrl, const void* data_ptr, size_t
 
         microrlr_t res = microrlOK;
         if (IS_CONTROL_CHAR(ch)) {
-            res = prv_process_control_char(mrl, ch);
+            res = prv_control_char_process(mrl, ch);
         } else {
             if (((ch == ' ') && (mrl->cmdlen == 0)) || IS_CONTROL_CHAR(ch)) {   /* Skip spaces in first command line symbol or escapes */
                 break;
