@@ -7,6 +7,7 @@
 2.  Add Alt+Backspace support
 3.  Add new ESC codes for HOME and END keys
 4.  New variable naming has been applied. The backward compatibility of the `userdata` attribute of the `microrl_t` structure is broken, the rest of the attributes should be private for the developer. The API is not changed
+5.  Rework history navigation
 
 
 ## v2.3.1

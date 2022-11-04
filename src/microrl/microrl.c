@@ -133,7 +133,7 @@ static microrlr_t prv_cmdline_buf_split(microrl_t* mrl, const char** tkn_str_arr
 #if MICRORL_CFG_USE_QUOTING
         if (*str == '"' || *str == '\'') {      /* Check if it starts with quote to handle escapes */
             ++str;
-            tkn_str_arr[num++] = str;               /* Set start of argument after quotes */
+            tkn_str_arr[num++] = str;           /* Set start of argument after quotes */
 
             while (*str != '\0') {              /* Process until end of quote */
                 if (!((size_t)(str - mrl->cmdline_str) < limit)) {
@@ -157,7 +157,7 @@ static microrlr_t prv_cmdline_buf_split(microrl_t* mrl, const char** tkn_str_arr
             }
         } else {
 #endif /* MICRORL_CFG_USE_QUOTING */
-            tkn_str_arr[num++] = str;               /* Set start of argument directly on character */
+            tkn_str_arr[num++] = str;           /* Set start of argument directly on character */
             while ((*str != ' ' && *str != '\0')) {
                 if (!((size_t)(str - mrl->cmdline_str) < limit)) {
                     tkn_str_arr[--num] = NULL;
@@ -400,7 +400,7 @@ static void prv_terminal_print_line(microrl_t* mrl, int32_t pos, uint8_t reset) 
         str_ptr = str;
     }
 
-    *str_ptr++ = '\033';                              /* Delete all past end of text */
+    *str_ptr++ = '\033';                        /* Delete all past end of text */
     *str_ptr++ = '[';
     *str_ptr++ = 'K';
     prv_cursor_generate_move(str_ptr, mrl->cursor - mrl->cmdlen);
@@ -415,13 +415,11 @@ static void prv_terminal_print_line(microrl_t* mrl, int32_t pos, uint8_t reset) 
  * \param[in,out]   idx_ptr: Pointer to the current record
  */
 static __INLINE__ void prv_hist_next_record(microrl_hist_rbuf_t* rbuf_ptr, size_t* idx_ptr) {
-    while (rbuf_ptr->ring_buf[*idx_ptr] != '\0') {
-        ++(*idx_ptr);
+    while (rbuf_ptr->ring_buf[++(*idx_ptr)] != '\0') {
         if (*idx_ptr >= MICRORL_ARRAYSIZE(rbuf_ptr->ring_buf)) {
             *idx_ptr -= MICRORL_ARRAYSIZE(rbuf_ptr->ring_buf);
         }
     }
-    ++(*idx_ptr);
 }
 
 /**
@@ -432,15 +430,6 @@ static void prv_hist_erase_older(microrl_hist_rbuf_t* rbuf_ptr) {
     size_t new_pos = rbuf_ptr->head;
     prv_hist_next_record(rbuf_ptr, &new_pos);
     rbuf_ptr->head = new_pos;
-
-    /*
-     * If after record erasing the head has moved further than the tail,
-     * then the history is empty, so it is needed to reset the tail
-     */
-    if (rbuf_ptr->head == rbuf_ptr->tail + 1) {
-        rbuf_ptr->tail = rbuf_ptr->head;
-        rbuf_ptr->ring_buf[rbuf_ptr->tail] = '\0';
-    }
 }
 
 /**
@@ -464,7 +453,7 @@ static microrl_hist_status_t prv_hist_is_space_for_new(microrl_hist_rbuf_t* rbuf
 }
 
 /**
- * \brief           Copy saved record to 'line' and return size of record
+ * \brief           Copy saved record to 'line_str' and return size of record
  * \param[in]       rbuf_ptr: Pointer to \ref microrl_hist_rbuf_t structure
  * \param[out]      line_str: Line to restore from history
  * \param[in]       dir: Record search direction, member of \ref microrl_hist_dir_t
@@ -473,36 +462,45 @@ static microrl_hist_status_t prv_hist_is_space_for_new(microrl_hist_rbuf_t* rbuf
 static size_t prv_hist_restore_line(microrl_hist_rbuf_t* rbuf_ptr, char* line_str, microrl_hist_dir_t dir) {
     size_t cnt = 0;
     size_t i = rbuf_ptr->head;
-    while (i - 1 != rbuf_ptr->tail) {              /* Count history records */
+    while (i != rbuf_ptr->tail) {               /* Count history records */
         prv_hist_next_record(rbuf_ptr, &i);
         ++cnt;
     }
 
-    size_t idx = rbuf_ptr->head;
-    size_t j = 0;
-    if (dir == MICRORL_HIST_DIR_UP) {           /* Set navigation counter depending on the direction */
-        if (cnt < rbuf_ptr->count) {
-            return 0;                           /* Impossible state, return empty line */
+    switch (dir) {
+        case MICRORL_HIST_DIR_UP: {             /* Set navigation counter depending on the direction */
+            if (cnt < rbuf_ptr->count) {
+                return 0;                       /* Impossible state, return empty line */
+            }
+            if (cnt != rbuf_ptr->count) {
+                ++rbuf_ptr->count;
+            }
+            break;
         }
-        if (cnt != rbuf_ptr->count) {
-            ++rbuf_ptr->count;
+        case MICRORL_HIST_DIR_DOWN: {
+            if (rbuf_ptr->count == 0) {
+                return 0;                       /* Empty line */
+            }
+            if (--rbuf_ptr->count == 0) {
+                return 0;                       /* Empty line */
+            }
+            break;
         }
-    } else if (dir == MICRORL_HIST_DIR_DOWN) {
-        if (rbuf_ptr->count == 0) {
-            return 0;                           /* Empty line */
-        }
-        if (--rbuf_ptr->count == 0) {
-            return 0;                           /* Empty line */
-        }
+        default:
+            break;
     }
 
-    while ((cnt - j++) != rbuf_ptr->count) {       /* Find record for 'rbuf_ptr->count' counter */
+    size_t idx = rbuf_ptr->head;
+    size_t j = 0;
+    while ((cnt - j++) != rbuf_ptr->count) {    /* Find record for 'rbuf_ptr->count' counter */
         prv_hist_next_record(rbuf_ptr, &idx);
     }
 
+    ++idx;                                      /* Move position from `\0` marker */
+
     size_t rec_len = 0;
     size_t k = idx;
-    while (rbuf_ptr->ring_buf[k] != '\0') {        /* Calculating the length of the found record */
+    while (rbuf_ptr->ring_buf[k] != '\0') {     /* Calculating the length of the found record */
         ++k;
         if (k >= MICRORL_ARRAYSIZE(rbuf_ptr->ring_buf)) {
             k -= MICRORL_ARRAYSIZE(rbuf_ptr->ring_buf);
@@ -554,11 +552,12 @@ static void prv_hist_save_line(microrl_hist_rbuf_t* rbuf_ptr, char* line_str, si
         return;
     }
 
-    while (prv_hist_is_space_for_new(rbuf_ptr, len) == MICRORL_HIST_FULL) {    /* Freeing up space for saving in the ring buffer */
+    /* Freeing up space for saving in the ring buffer */
+    while (prv_hist_is_space_for_new(rbuf_ptr, len) == MICRORL_HIST_FULL) {
         prv_hist_erase_older(rbuf_ptr);
     }
 
-    if (len < (MICRORL_ARRAYSIZE(rbuf_ptr->ring_buf) - rbuf_ptr->tail - 1)) {     /* Store record */
+    if (len < (MICRORL_ARRAYSIZE(rbuf_ptr->ring_buf) - rbuf_ptr->tail - 1)) {  /* Store record */
         memcpy(rbuf_ptr->ring_buf + rbuf_ptr->tail + 1, line_str, len);
     } else {
         size_t part_len = MICRORL_ARRAYSIZE(rbuf_ptr->ring_buf) - rbuf_ptr->tail - 1;
@@ -566,10 +565,7 @@ static void prv_hist_save_line(microrl_hist_rbuf_t* rbuf_ptr, char* line_str, si
         memcpy(rbuf_ptr->ring_buf, line_str + part_len, len - part_len);
     }
 
-    if (rbuf_ptr->head == rbuf_ptr->tail) {           /* Update position pointer and navigation counter */
-        ++rbuf_ptr->head;
-    }
-    rbuf_ptr->tail = rbuf_ptr->tail + len + 1;
+    rbuf_ptr->tail = rbuf_ptr->tail + len + 1;  /* Update position pointer and navigation counter */
     if (rbuf_ptr->tail >= MICRORL_ARRAYSIZE(rbuf_ptr->ring_buf)) {
         rbuf_ptr->tail -= MICRORL_ARRAYSIZE(rbuf_ptr->ring_buf);
     }
@@ -1131,7 +1127,7 @@ microrlr_t microrl_processing_input(microrl_t* mrl, const void* data_ptr, size_t
              * triggering a newline.
              */
             if (mrl->last_endl == (ch == MICRORL_ESC_ANSI_CR ? MICRORL_ESC_ANSI_LF : MICRORL_ESC_ANSI_CR)) {
-                mrl->last_endl = 0;         /* Ignore char, but clear newline state */
+                mrl->last_endl = 0;             /* Ignore char, but clear newline state */
             } else {
                 mrl->last_endl = ch;
                 if (prv_handle_newline(mrl) != microrlOK) {
