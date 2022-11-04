@@ -526,6 +526,12 @@ static size_t prv_hist_restore_line(microrl_hist_rbuf_t* rbuf_ptr, char* line_st
  * \param[in]       dir: Member of \ref microrl_hist_dir_t enumeration
  */
 static void prv_hist_search(microrl_t* mrl, microrl_hist_dir_t dir) {
+#if MICRORL_CFG_USE_ECHO_OFF
+    if (mrl->echo != MICRORL_ECHO_ON) {
+        return;
+    }
+#endif /* MICRORL_CFG_USE_ECHO_OFF */
+
     size_t len = prv_hist_restore_line(&mrl->ring_hist, mrl->cmdline_str, dir);
     memset(&mrl->cmdline_str[len], 0x00, MICRORL_ARRAYSIZE(mrl->cmdline_str) - 1 - len);
     mrl->cursor = mrl->cmdlen = len;
@@ -593,31 +599,13 @@ static uint8_t prv_escape_process(microrl_t* mrl, char ch) {
     } else if (mrl->esc_code == MICRORL_ESC_BRACKET) {
         if (ch == 'A') {                        /* UP */
 #if MICRORL_CFG_USE_HISTORY
-
-#if MICRORL_CFG_USE_ECHO_OFF
-            if (mrl->echo != MICRORL_ECHO_ON) {
-                return 1;
-            }
-#endif /* MICRORL_CFG_USE_ECHO_OFF */
-
             prv_hist_search(mrl, MICRORL_HIST_DIR_UP);
-
 #endif /* MICRORL_CFG_USE_HISTORY */
-
             return 1;
         } else if (ch == 'B') {                 /* DOWN */
 #if MICRORL_CFG_USE_HISTORY
-
-#if MICRORL_CFG_USE_ECHO_OFF
-            if (mrl->echo != MICRORL_ECHO_ON) {
-                return 1;
-            }
-#endif /* MICRORL_CFG_USE_ECHO_OFF */
-
             prv_hist_search(mrl, MICRORL_HIST_DIR_DOWN);
-
 #endif /* MICRORL_CFG_USE_HISTORY */
-
             return 1;
         } else if (ch == 'C') {                 /* RIGHT */
             if (mrl->cursor < mrl->cmdlen) {
@@ -1005,29 +993,14 @@ static microrlr_t prv_process_control_char(microrl_t* mrl, char ch) {
         }
         case MICRORL_ESC_ANSI_DLE: { /* ^P */
 #if MICRORL_CFG_USE_HISTORY
-
-#if MICRORL_CFG_USE_ECHO_OFF
-            if (mrl->echo != MICRORL_ECHO_ON) {
-                break;
-            }
-#endif /* MICRORL_CFG_USE_ECHO_OFF */
-
             prv_hist_search(mrl, MICRORL_HIST_DIR_UP);
 #endif /* MICRORL_CFG_USE_HISTORY */
-
             break;
         }
         case MICRORL_ESC_ANSI_SO: { /* ^N */
 #if MICRORL_CFG_USE_HISTORY
-#if MICRORL_CFG_USE_ECHO_OFF
-        if (mrl->echo != MICRORL_ECHO_ON) {
-            break;
-        }
-#endif /* MICRORL_CFG_USE_ECHO_OFF */
-
             prv_hist_search(mrl, MICRORL_HIST_DIR_DOWN);
 #endif /* MICRORL_CFG_USE_HISTORY */
-
             break;
         }
         case MICRORL_ESC_ANSI_DEL:  /* Backspace */
