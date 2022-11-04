@@ -72,11 +72,11 @@ typedef enum {
  * \brief           ESC seq internal codes
  */
 typedef enum {
-    MICRORL_ESC_BRACKET,                        /*!< Encountered '[' character after ESQ code */
-    MICRORL_ESC_HOME,                           /*!< Encountered 'HOME' code after ESQ code */
-    MICRORL_ESC_END,                            /*!< Encountered 'END' code after ESQ code */
-    MICRORL_ESC_DEL                             /*!< Encountered 'DEL' code after ESQ code */
-} microrl_esq_code_t;
+    MICRORL_ESC_BRACKET,                        /*!< Encountered '[' character after ESC code */
+    MICRORL_ESC_HOME,                           /*!< Encountered 'HOME' code after ESC code */
+    MICRORL_ESC_END,                            /*!< Encountered 'END' code after ESC code */
+    MICRORL_ESC_DEL                             /*!< Encountered 'DEL' code after ESC code */
+} microrl_esc_code_t;
 
 #if MICRORL_CFG_USE_ECHO_OFF || __DOXYGEN__
 /**
@@ -103,7 +103,7 @@ struct microrl_hist_rbuf;
  *
  */
 typedef struct microrl_hist_rbuf {
-    char ring_buf[MICRORL_CFG_RING_HISTORY_LEN];/*!< History ring buffer */
+    char ring_buf[MICRORL_CFG_RING_HISTORY_LEN];/*!< History buffer */
     size_t head;                                /*!< Buffer head position */
     size_t tail;                                /*!< Buffer tail position */
     size_t count;                               /*!< Navigation counter */
@@ -165,7 +165,7 @@ typedef struct microrl {
     char last_endl;                             /*!< Either 0 or the CR or LF that just triggered a newline */
 
 #if MICRORL_CFG_USE_ESC_SEQ || __DOXYGEN__
-    microrl_esq_code_t esc_code;                /*!< Code of first escape sequence symbol */
+    microrl_esc_code_t esc_code;                /*!< Code of first escape sequence symbol */
     uint8_t escape;                             /*!< Escape sequence caught flag */
 #endif /* MICRORL_CFG_USE_ESC_SEQ || __DOXYGEN__ */
 

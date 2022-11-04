@@ -290,7 +290,7 @@ static __INLINE__ void prv_terminal_newline(microrl_t* mrl) {
 }
 
 /**
- * \brief           Insert ESQ sequence into the passed string to set the cursor
+ * \brief           Insert ESC sequence into the passed string to set the cursor
  *                      at the current position + offset (positive or negative)
  *                      in in the terminal command line.
  *                      The passed string must be at least 7 bytes long
