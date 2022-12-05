@@ -244,6 +244,14 @@ extern "C" {
 #endif
 
 /**
+ * \brief           Set compiler specific keywords notation for inline functions
+ *                      In GGC the 'inline' is used, but in KEIL-MDK the '__inline' is used
+ * \note            You can set just 'static' option to not use inline functions
+ */
+#ifndef MICRORL_CFG_STATIC_INLINE
+#define MICRORL_CFG_STATIC_INLINE             static inline
+#endif
+/**
  * \}
  */
 

@@ -2,7 +2,7 @@
 
 ## Develop
 
-
+1.  Move `inline` keyword setting to config file
 
 
 ## v2.4.2
