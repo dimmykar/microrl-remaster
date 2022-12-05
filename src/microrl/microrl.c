@@ -57,7 +57,7 @@
 #warning "Unknown compiler. 'inline' keyword is not set"
 #endif /* defined(__GNUC__) */
 
-#define IS_CONTROL_CHAR(x)                  ((x) <= 31 || (x) == MICRORL_ESC_ANSI_DEL)
+#define IS_CONTROL_CHAR(x)                  ((x) <= MICRORL_ESC_ANSI_US || (x) == MICRORL_ESC_ANSI_DEL)
 
 /**
  * \brief           List of ANSI escape codes
