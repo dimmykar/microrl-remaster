@@ -201,9 +201,9 @@ int execute(microrl_t* mrl, int argc, const char* const *argv) {
  * \param[in,out]   mrl: \ref microrl_t working instance
  * \param[in]       argc: argument count
  * \param[in]       argv: pointer array to token string
- * \return          NULL-terminated string, contain complite variant split by 'Whitespace'
+ * \return          NULL-terminated string, contain complete variant split by 'Whitespace'
  */
-char ** complet(microrl_t* mrl, int argc, const char* const *argv) {
+char ** complete(microrl_t* mrl, int argc, const char* const *argv) {
     (void)mrl;
     int j = 0;
 

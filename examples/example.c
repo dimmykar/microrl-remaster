@@ -46,7 +46,7 @@ int main (void/*int argc, char** argv*/) {
 
 #if MICRORL_CFG_USE_COMPLETE
     /* Set callback for auto-completion */
-    microrl_set_complete_callback(prl, complet);
+    microrl_set_complete_callback(prl, complete);
 #endif /* MICRORL_CFG_USE_COMPLETE */
 
 #if MICRORL_CFG_USE_CTRL_C

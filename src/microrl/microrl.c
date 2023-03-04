@@ -714,7 +714,7 @@ exit:
  * \param[in]       arr: Completion tokens array
  * \return          Total length of all completion tokens
  */
-static size_t prv_complite_total_len(const char* const * argv) {
+static size_t prv_complete_total_len(const char* const * argv) {
     size_t i;
     const char* short_str = (const char*)argv[0];
     size_t shortlen = strlen(short_str);
@@ -743,7 +743,7 @@ static size_t prv_complite_total_len(const char* const * argv) {
  * \param[in,out]   mrl: \ref microrl_t working instance
  * \return          \ref microrlOK on success, member of \ref microrlr_t enumeration otherwise
  */
-static microrlr_t prv_complite_get_input(microrl_t* mrl) {
+static microrlr_t prv_complete_get_input(microrl_t* mrl) {
     /* Skip completion when echo is OFF */
 #if MICRORL_CFG_USE_ECHO_OFF
     if (mrl->echo != MICRORL_ECHO_ON) {
@@ -777,7 +777,7 @@ static microrlr_t prv_complite_get_input(microrl_t* mrl) {
     if (cmplt_tkn_arr[1] == NULL) {
         len = strlen(cmplt_tkn_arr[0]);
     } else {
-        len = prv_complite_total_len((const char* const *)cmplt_tkn_arr);
+        len = prv_complete_total_len((const char* const *)cmplt_tkn_arr);
         prv_terminal_newline(mrl);
         while (cmplt_tkn_arr[i] != NULL) {
             mrl->out_fn(mrl, cmplt_tkn_arr[i]);
@@ -945,7 +945,7 @@ static microrlr_t prv_control_char_process(microrl_t* mrl, char ch) {
             if (mrl->get_completion_fn == NULL) {
                 return microrlERRPAR;
             }
-            if (prv_complite_get_input(mrl) != microrlOK) {
+            if (prv_complete_get_input(mrl) != microrlOK) {
                 return microrlERRCPLT;
             }
 #endif /* MICRORL_CFG_USE_COMPLETE */

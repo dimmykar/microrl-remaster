@@ -18,7 +18,7 @@ void print(microrl_t* mrl, const char* str);
 int execute(microrl_t* mrl, int argc, const char* const *argv);
 
 // completion callback
-char ** complet(microrl_t* mrl, int argc, const char* const *argv);
+char ** complete(microrl_t* mrl, int argc, const char* const *argv);
 
 // ctrl+c callback
 void sigint(microrl_t* mrl);
