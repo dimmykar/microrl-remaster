@@ -745,9 +745,11 @@ static size_t prv_complite_total_len(const char* const * argv) {
  */
 static microrlr_t prv_complite_get_input(microrl_t* mrl) {
     /* Skip completion when echo is OFF */
+#if MICRORL_CFG_USE_ECHO_OFF
     if (mrl->echo != MICRORL_ECHO_ON) {
         return microrlOK;
     }
+#endif /* MICRORL_CFG_USE_ECHO_OFF */
 
     uint8_t tkn_cnt = 0;
     const char* tkn_str_arr[MICRORL_CFG_CMD_TOKEN_NMB] = {0};
