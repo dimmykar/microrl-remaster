@@ -1,7 +1,11 @@
 # Changelog
 
-
 ## Develop
+
+
+
+
+## v2.4.1
 
 1. Fix compilation error when MICRORL_CFG_USE_ECHO_OFF=0 [#6](https://github.com/dimmykar/microrl-remaster/issues/6)
 
