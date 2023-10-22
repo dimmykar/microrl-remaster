@@ -9,9 +9,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,7 +28,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
-#include <unistd.h> 
+#include <unistd.h>
 #include <string.h>
 #include "microrl.h"
 
@@ -81,7 +81,7 @@ void init(void) {
  */
 int print(microrl_t* mrl, const char* str) {
     MICRORL_UNUSED(mrl);
-    
+
     return fprintf(stdout, "%s", str);
 }
 
@@ -236,7 +236,7 @@ char ** complete(microrl_t* mrl, int argc, const char* const *argv) {
 
     /* Note! Last ptr in array always must be NULL!!! */
     compl_word[j] = NULL;
-    
+
     /* Return set of variants */
     return compl_word;
 }

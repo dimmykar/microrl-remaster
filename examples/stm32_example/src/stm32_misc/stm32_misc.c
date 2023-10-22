@@ -9,9 +9,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -82,7 +82,7 @@ uint8_t  passw_in = 0;
 void init(void) {
     LL_USART_InitTypeDef USART_InitStruct = {0};
     LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
-  
+
     LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOC);
     LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_UART4);
     __DSB();
@@ -121,7 +121,7 @@ void init(void) {
 int print(microrl_t* mrl, const char* str) {
     MICRORL_UNUSED(mrl);
     uint32_t i = 0;
-    
+
     while (str[i] != 0) {
         while (!LL_USART_IsActiveFlag_TXE(UART4)) {}
         LL_USART_TransmitData8(UART4, str[i++]);
@@ -201,7 +201,7 @@ void clear_screen(microrl_t* mrl) {
  */
 void str_to_u32(char* str, uint32_t* val) {
     uint32_t temp = 0;
- 
+
     for (uint8_t i = 0; str[i] >= 0x30 && str[i] <= 0x39; ++i) {
         temp = temp + (str[i] & 0x0F);
         temp = temp * 10;
@@ -225,14 +225,14 @@ void u32_to_str(uint32_t* val, char* str) {
     for (n = 0; v > 0; v /= 10) {
         str[s + n++] = "0123456789"[v % 10];
     }
-    
+
     /* Reverse a string */
     for (size_t i = 0; i < n / 2; ++i) {
         t = str[s + i];
         str[s + i] = str[s + n - i - 1];
         str[s + n - i - 1] = t;
     }
-    
+
     if (val == NULL) {
         str[n++] = '0';  /* Handle special case */
     }
@@ -247,7 +247,7 @@ void read_sernum(microrl_t* mrl) {
     char sn_str[11] = {0};
     uint32_t sn = device_sn;
     u32_to_str(&sn, sn_str);
-    
+
     print(mrl, "\tS/N ");
     print(mrl, sn_str);
     print(mrl, _ENDLINE_SEQ);
@@ -260,17 +260,17 @@ void read_sernum(microrl_t* mrl) {
  */
 void set_sernum(microrl_t* mrl, char* str_val) {
     uint32_t sn = 0;
-    
+
     str_to_u32(str_val, &sn);
     if (sn != 0) {
         device_sn = sn;
-        
+
         print(mrl, "\tset S/N ");
         print(mrl, str_val);
         print(mrl, _ENDLINE_SEQ);
         return;
     }
-    
+
     print(mrl, "\tS/N not set"_ENDLINE_SEQ);
 }
 

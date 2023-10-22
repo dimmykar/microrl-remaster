@@ -9,9 +9,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -76,7 +76,7 @@ void init(void) {
 int print(microrl_t* mrl, const char* str) {
     MICRORL_UNUSED(mrl);
     int i = 0;
-    
+
     while (str[i] != 0) {
         while (!(UCSRA & (1 << UDRE)));
         UDR = str[i++];
@@ -171,7 +171,7 @@ int execute(microrl_t* mrl, int argc, const char* const *argv) {
         } else if (strcmp(argv[i], _CMD_CLEAR) == 0) {
             print(mrl, "\033[2J");    /* ESC seq for clear entire screen */
             print(mrl, "\033[H");     /* ESC seq for move cursor at left-top corner */
-        } else if ((strcmp(argv[i], _CMD_SET) == 0) || 
+        } else if ((strcmp(argv[i], _CMD_SET) == 0) ||
                    (strcmp(argv[i], _CMD_CLR) == 0)) {
             if (++i < argc) {
                 int val = strcmp(argv[i - 1], _CMD_CLR);
@@ -234,7 +234,7 @@ char ** complete(microrl_t* mrl, int argc, const char* const *argv) {
                 compl_word[j++] = keyword[i];
             }
         }
-    }  else if ((argc > 1) && ((strcmp(argv[0], _CMD_SET) == 0) || 
+    }  else if ((argc > 1) && ((strcmp(argv[0], _CMD_SET) == 0) ||
                              (strcmp(argv[0], _CMD_CLR) == 0))) { /* If command needs subcommands */
         /* Iterate through subcommand */
         for (int i = 0; i < _NUM_OF_SETCLEAR_SCMD; i++) {

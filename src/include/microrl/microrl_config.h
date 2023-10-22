@@ -10,9 +10,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -152,7 +152,7 @@ extern "C" {
 
 /**
  * \brief           Size of the buffer used for piecemeal printing of part or all of the command
- *                  line buffer. Allocated on the stack. Must be at least 16.                 
+ *                  line buffer. Allocated on the stack. Must be at least 16.
  */
 #ifndef MICRORL_CFG_PRINT_BUFFER_LEN
 #define MICRORL_CFG_PRINT_BUFFER_LEN          40
@@ -195,9 +195,9 @@ extern "C" {
 #endif
 
 /**
- * \brief           Print prompt at 'microrl_init()'. If enable, prompt will print at startup, 
+ * \brief           Print prompt at 'microrl_init()'. If enable, prompt will print at startup,
  *                  otherwise first prompt will print after first press 'Enter' in terminal
- * \note            Enable it, if you call 'microrl_init()' after your communication subsystem 
+ * \note            Enable it, if you call 'microrl_init()' after your communication subsystem
  *                  already initialize and ready to print message
  */
 #ifndef MICRORL_CFG_PROMPT_ON_INIT
