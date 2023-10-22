@@ -418,6 +418,9 @@ static __INLINE__ void prv_hist_next_record(microrl_hist_rbuf_t* rbuf_ptr, size_
     while (rbuf_ptr->ring_buf[++(*idx_ptr)] != '\0') {
         if (*idx_ptr >= MICRORL_ARRAYSIZE(rbuf_ptr->ring_buf)) {
             *idx_ptr -= MICRORL_ARRAYSIZE(rbuf_ptr->ring_buf);
+            if (rbuf_ptr->ring_buf[*idx_ptr] == '\0') {
+                break;
+            }
         }
     }
 }
@@ -500,8 +503,7 @@ static size_t prv_hist_restore_line(microrl_hist_rbuf_t* rbuf_ptr, char* line_st
 
     size_t rec_len = 0;
     size_t k = idx;
-    while (rbuf_ptr->ring_buf[k] != '\0') {     /* Calculating the length of the found record */
-        ++k;
+    while (rbuf_ptr->ring_buf[k++] != '\0') {   /* Calculating the length of the found record */
         if (k >= MICRORL_ARRAYSIZE(rbuf_ptr->ring_buf)) {
             k -= MICRORL_ARRAYSIZE(rbuf_ptr->ring_buf);
         }
