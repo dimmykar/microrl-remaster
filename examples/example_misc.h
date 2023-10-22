@@ -22,7 +22,7 @@
  * This file is part of MicroRL - Micro Read Line library for small and embedded devices.
  *
  * Author:          Eugene SAMOYLOV aka Helius <ghelius@gmail.com>
- * Version:         2.4.1
+ * Version:         2.4.2
  */
 
 #ifndef MICRORL_EXAMPLE_MISC_HDR_H

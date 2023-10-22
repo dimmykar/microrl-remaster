@@ -21,7 +21,7 @@
  * This file is part of MicroRL - Micro Read Line library for small and embedded devices.
  *
  * Authors:         Dmitry KARASEV <karasevsdmitry@yandex.ru>
- * Version:         2.4.1
+ * Version:         2.4.2
  */
 
 #ifndef MICRORL_HDR_USER_CONFIG_H
