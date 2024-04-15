@@ -74,6 +74,13 @@ extern "C" {
 #define MICRORL_CFG_PROMPT_STRING             "> "
 #endif
 
+/**
+ * \brief           Enable ANSI color escape sequences in prompt
+ */
+#ifndef MICRORL_CFG_USE_PROMPT_COLOR
+#define MICRORL_CFG_USE_PROMPT_COLOR          1
+#endif
+
 #define MICRORL_COLOR_RED                     "\033[31m"
 #define MICRORL_COLOR_GREEN                   "\033[32m"
 #define MICRORL_COLOR_YELLOW                  "\033[33m"

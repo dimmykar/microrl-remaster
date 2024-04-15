@@ -244,9 +244,13 @@ MICRORL_CFG_STATIC_INLINE void prv_cmdline_buf_reset(microrl_t* mrl) {
  * \param[in]       mrl: \ref microrl_t working instance
  */
 MICRORL_CFG_STATIC_INLINE void prv_terminal_print_prompt(microrl_t* mrl) {
+#if MICRORL_CFG_USE_PROMPT_COLOR
     mrl->out_fn(mrl, MICRORL_CFG_PROMPT_COLOR);
     mrl->out_fn(mrl, mrl->prompt_ptr);
     mrl->out_fn(mrl, MICRORL_COLOR_DEFAULT);
+#else
+    mrl->out_fn(mrl, mrl->prompt_ptr);
+#endif
 }
 
 /**
