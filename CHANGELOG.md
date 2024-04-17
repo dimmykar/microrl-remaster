@@ -2,6 +2,11 @@
 
 ## Develop
 
+
+
+
+## v2.5.0
+
 1.  Move `inline` keyword setting to config file
 2.  Add configuration parameter for prompt coloring
 
