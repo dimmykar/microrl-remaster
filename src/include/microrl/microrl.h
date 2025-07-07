@@ -159,6 +159,7 @@ typedef struct microrl {
 #endif /* MICRORL_CFG_USE_CTRL_C || __DOXYGEN__ */
 
     char* prompt_ptr;                           /*!< Pointer to prompt string */
+    size_t prompt_size;                          /*!< Size of prompt string */
     char cmdline_str[MICRORL_CFG_CMDLINE_LEN + 1];  /*!< Command line input buffer with NULL character */
     size_t cmdlen;                              /*!< Command length in command line buffer */
     size_t cursor;                              /*!< Command line buffer position pointer */
