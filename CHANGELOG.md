@@ -5,6 +5,11 @@
 
 
 
+## v2.5.1
+
+1. Fix prompt size to skip ANSII color chars [#9](https://github.com/dimmykar/microrl-remaster/pull/9)
+
+
 ## v2.5.0
 
 1.  Move `inline` keyword setting to config file

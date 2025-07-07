@@ -23,7 +23,7 @@
  *
  * Authors:         Eugene SAMOYLOV aka Helius <ghelius@gmail.com>,
  *                  Dmitry KARASEV <karasevsdmitry@yandex.ru>
- * Version:         2.5.0
+ * Version:         2.5.1
  */
 
 #include <stdint.h>
@@ -887,7 +887,7 @@ microrlr_t microrl_set_sigint_callback(microrl_t* mrl, microrl_sigint_fn sigint_
 static size_t prv_calculate_prompt_size(const char* prompt_str) {
     size_t size = 0;
     const char* ptr = prompt_str;
-    
+
     while (*ptr != '\0') {
         if (*ptr == '\033') {                 // Check for ANSI escape code
             while (*ptr != 'm' && *ptr != '\0') {
@@ -901,7 +901,7 @@ static size_t prv_calculate_prompt_size(const char* prompt_str) {
             ++ptr;
         }
     }
-    
+
     return size;
 }
 #endif
