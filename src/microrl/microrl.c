@@ -350,10 +350,10 @@ static void prv_terminal_print_line(microrl_t* mrl, int32_t pos, uint8_t reset) 
     if (reset) {
 #if MICRORL_CFG_USE_CARRIAGE_RETURN
         *str_ptr++ = '\r';
-        str_ptr = prv_cursor_generate_move(str_ptr, strlen(mrl->prompt_ptr) + pos);
+        str_ptr = prv_cursor_generate_move(str_ptr, mrl->prompt_size + pos);
 #else
-        str_ptr = prv_cursor_generate_move(str_ptr, -(MICRORL_ARRAYSIZE(mrl->cmdline_str) - 1 + strlen(mrl->prompt_ptr) + 2));
-        str_ptr = prv_cursor_generate_move(str_ptr, strlen(mrl->prompt_ptr) + pos);
+        str_ptr = prv_cursor_generate_move(str_ptr, -(MICRORL_ARRAYSIZE(mrl->cmdline_str) - 1 + mrl->prompt_size + 2));
+        str_ptr = prv_cursor_generate_move(str_ptr, mrl->prompt_size + pos);
 #endif /* MICRORL_CFG_USE_CARRIAGE_RETURN */
     }
 
@@ -811,7 +811,7 @@ microrlr_t microrl_init(microrl_t* mrl, microrl_output_fn out_fn, microrl_exec_f
     memset(mrl, 0x00, sizeof(microrl_t));
     mrl->out_fn = out_fn;
     mrl->exec_fn = exec_fn;
-    mrl->prompt_ptr = MICRORL_CFG_PROMPT_STRING;
+    microrl_set_prompt(mrl, MICRORL_CFG_PROMPT_STRING);
 
 #if MICRORL_CFG_PROMPT_ON_INIT
     prv_terminal_print_prompt(mrl);
@@ -877,6 +877,35 @@ microrlr_t microrl_set_sigint_callback(microrl_t* mrl, microrl_sigint_fn sigint_
 }
 #endif /* MICRORL_CFG_USE_CTRL_C || __DOXYGEN__ */
 
+
+#if MICRORL_CFG_USE_PROMPT_COLOR
+/**
+ * \brief           Calculate prompt size excluding ANSI escape sequences
+ * \param[in]       prompt_str: Pointer to prompt string
+ * \return          Size of prompt string excluding ANSI escape sequences
+ */
+static size_t prv_calculate_prompt_size(const char* prompt_str) {
+    size_t size = 0;
+    const char* ptr = prompt_str;
+    
+    while (*ptr != '\0') {
+        if (*ptr == '\033') {                 // Check for ANSI escape code
+            while (*ptr != 'm' && *ptr != '\0') {
+                ++ptr;                        // Skip ANSI escape code
+            }
+            if (*ptr == 'm') {
+                ++ptr;                        // Move past 'm'
+            }
+        } else {
+            ++size;                           // Count regular character
+            ++ptr;
+        }
+    }
+    
+    return size;
+}
+#endif
+
 /**
  * \brief           Set prompt string
  * \param[in,out]   mrl: \ref microrl_t working instance
@@ -889,6 +918,11 @@ microrlr_t  microrl_set_prompt(microrl_t* mrl, char* prompt_str) {
     }
 
     mrl->prompt_ptr = prompt_str;
+#if MICRORL_CFG_USE_PROMPT_COLOR
+    mrl->prompt_size = prv_calculate_prompt_size(prompt_str);
+#else
+    mrl->prompt_size = strlen(prompt_str);
+#endif
 
     return microrlOK;
 }
