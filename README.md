@@ -30,6 +30,7 @@ Microrl library is designed to help implement command line interface in small an
     * Ctrl+N (like cursor arrow down)
     * Ctrl+R (retype prompt and partial command)
     * Ctrl+C (call `sigint()` callback, only for embedded system)
+    * Ctrl+L (clear terminal)
 
   - History (optional)
     * Static ring buffer history for memory saving. Number of commands saved to history depends from commands length and buffer size (defined in config)
