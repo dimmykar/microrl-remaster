@@ -201,6 +201,8 @@ microrlr_t  microrl_processing_input(microrl_t* mrl, const void* data_ptr, size_
 
 uint32_t    microrl_get_version(void);
 
+microrlr_t  microrl_clear_terminal(microrl_t* mrl);
+
 /**
  * \}
  */

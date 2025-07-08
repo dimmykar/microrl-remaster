@@ -1054,6 +1054,10 @@ static microrlr_t prv_control_char_process(microrl_t* mrl, char ch) {
 #endif /* MICRORL_CFG_USE_CTRL_C */
             break;
         }
+        case MICRORL_ESC_ANSI_FF: { /* ^L */
+            microrl_clear_terminal(mrl);
+            break;
+        }
         default:
             break;
     }
@@ -1158,4 +1162,23 @@ microrlr_t microrl_processing_input(microrl_t* mrl, const void* data_ptr, size_t
  */
 uint32_t microrl_get_version(void) {
     return ((MICRORL_VERSION_MAJOR << 16) | (MICRORL_VERSION_MINOR << 8) | (MICRORL_VERSION_PATCH));
+}
+
+
+/**
+ * \brief           Clear terminal screen and print prompt
+ * \param[in,out]   mrl: \ref microrl_t working instance
+ * \return          \ref microrlOK on success, member of \ref microrlr_t enumeration otherwise
+ */
+microrlr_t  microrl_clear_terminal(microrl_t* mrl){
+    if (mrl == NULL) {
+        return microrlERRPAR;
+    }
+
+    mrl->out_fn(mrl, "\033[2J");        /* Clear screen */
+    mrl->out_fn(mrl, "\033[H");         /* Move cursor to home position */
+    prv_terminal_print_prompt(mrl);
+    prv_terminal_print_line(mrl, 0, 0);
+
+    return microrlOK;
 }
