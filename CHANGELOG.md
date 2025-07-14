@@ -5,6 +5,13 @@
 
 
 
+## v2.6.0
+
+1. Clearing terminal screen with printing prompt using [#10](https://github.com/dimmykar/microrl-remaster/pull/10)
+   - New API `microrl_clear_terminal()`
+   - `CTRL+L` keys action
+
+
 ## v2.5.1
 
 1. Fix prompt size to skip ANSII color chars [#9](https://github.com/dimmykar/microrl-remaster/pull/9)
