@@ -750,6 +750,12 @@ static microrlr_t prv_complete_get_input(microrl_t* mrl) {
 
     cmplt_tkn_arr = mrl->get_completion_fn(mrl, tkn_cnt, tkn_str_arr);
     if (cmplt_tkn_arr[0] == NULL) {
+        /* Restore whitespaces replaced with '0' when command line buffer was split */
+        if (tkn_cnt != 0) {
+            for (size_t i = 0; i < (size_t)(tkn_cnt - 1); ++i) {
+                memset((char*)tkn_str_arr[i] + strlen(tkn_str_arr[i]), ' ', 1);
+            }
+        }
         return microrlERRCPLT;
     }
 
@@ -1055,7 +1061,7 @@ static microrlr_t prv_control_char_process(microrl_t* mrl, char ch) {
             break;
         }
         case MICRORL_ESC_ANSI_FF: { /* ^L */
-            microrl_clear_terminal(mrl);
+            microrl_clear_terminal(mrl, 0);
             break;
         }
         default:
@@ -1168,17 +1174,23 @@ uint32_t microrl_get_version(void) {
 /**
  * \brief           Clear terminal screen and print prompt
  * \param[in,out]   mrl: \ref microrl_t working instance
+ * \param[in]       reset: reset the current command line buffer
  * \return          \ref microrlOK on success, member of \ref microrlr_t enumeration otherwise
  */
-microrlr_t  microrl_clear_terminal(microrl_t* mrl){
+microrlr_t  microrl_clear_terminal(microrl_t* mrl, uint8_t reset){
     if (mrl == NULL) {
         return microrlERRPAR;
     }
-
+    
+    mrl->out_fn(mrl, "\033[3J");        /* Clear entire screen + scrollback */
     mrl->out_fn(mrl, "\033[2J");        /* Clear screen */
-    mrl->out_fn(mrl, "\033[H");         /* Move cursor to home position */
-    prv_terminal_print_prompt(mrl);
-    prv_terminal_print_line(mrl, 0, 0);
+    mrl->out_fn(mrl, "\033[1;1H");      /* Move cursor to position 1,1 */
+    mrl->out_fn(mrl, "\033[0m");        /* Reset all attributes */
+    if (!reset) {
+        // If reset is not requested, reprint current command line: used with Ctrl+L
+        prv_terminal_print_prompt(mrl);
+        prv_terminal_print_line(mrl, 0, 0);
+    }
 
     return microrlOK;
 }
