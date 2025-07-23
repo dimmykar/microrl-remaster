@@ -750,6 +750,12 @@ static microrlr_t prv_complete_get_input(microrl_t* mrl) {
 
     cmplt_tkn_arr = mrl->get_completion_fn(mrl, tkn_cnt, tkn_str_arr);
     if (cmplt_tkn_arr[0] == NULL) {
+        /* Restore whitespaces replaced with '0' when command line buffer was split */
+        if (tkn_cnt != 0) {
+            for (size_t i = 0; i < (size_t)(tkn_cnt - 1); ++i) {
+                memset((char*)tkn_str_arr[i] + strlen(tkn_str_arr[i]), ' ', 1);
+            }
+        }
         return microrlERRCPLT;
     }
 
